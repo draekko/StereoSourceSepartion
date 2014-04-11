@@ -10,8 +10,8 @@
 
 */
 
-#ifndef __APPHEADERFILE_RWORPQ__
-#define __APPHEADERFILE_RWORPQ__
+#ifndef __APPHEADERFILE_E5BN8L__
+#define __APPHEADERFILE_E5BN8L__
 
 #include "AppConfig.h"
 #include "modules/juce_audio_basics/juce_audio_basics.h"
@@ -42,4 +42,4 @@ namespace ProjectInfo
     const int          versionNumber  = 0x10000;
 }
 
-#endif   // __APPHEADERFILE_RWORPQ__
+#endif   // __APPHEADERFILE_E5BN8L__

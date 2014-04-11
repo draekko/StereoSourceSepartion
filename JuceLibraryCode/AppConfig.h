@@ -11,8 +11,8 @@
 
 */
 
-#ifndef __JUCE_APPCONFIG_RWORPQ__
-#define __JUCE_APPCONFIG_RWORPQ__
+#ifndef __JUCE_APPCONFIG_E5BN8L__
+#define __JUCE_APPCONFIG_E5BN8L__
 
 //==============================================================================
 // [BEGIN_USER_CODE_SECTION]
@@ -219,7 +219,7 @@
  #define JucePlugin_Desc                   "StereoSourceSeparation"
 #endif
 #ifndef  JucePlugin_Manufacturer
- #define JucePlugin_Manufacturer           "yourcompany"
+ #define JucePlugin_Manufacturer           "AnnieShin"
 #endif
 #ifndef  JucePlugin_ManufacturerWebsite
  #define JucePlugin_ManufacturerWebsite    ""
@@ -240,7 +240,7 @@
  #define JucePlugin_MaxNumOutputChannels   2
 #endif
 #ifndef  JucePlugin_PreferredChannelConfigurations
- #define JucePlugin_PreferredChannelConfigurations  {1, 1}, {2, 2}
+ #define JucePlugin_PreferredChannelConfigurations  {2, 2}
 #endif
 #ifndef  JucePlugin_IsSynth
  #define JucePlugin_IsSynth                0
@@ -288,7 +288,7 @@
  #define JucePlugin_AUManufacturerCode     JucePlugin_ManufacturerCode
 #endif
 #ifndef  JucePlugin_CFBundleIdentifier
- #define JucePlugin_CFBundleIdentifier     com.yourcompany.StereoSourceSeparation
+ #define JucePlugin_CFBundleIdentifier     com.annieshin.StereoSourceSeparation
 #endif
 #ifndef  JucePlugin_RTASCategory
  #define JucePlugin_RTASCategory           ePlugInCategory_None
@@ -306,7 +306,7 @@
  #define JucePlugin_RTASDisableMultiMono   0
 #endif
 #ifndef  JucePlugin_AAXIdentifier
- #define JucePlugin_AAXIdentifier          com.yourcompany.StereoSourceSeparation
+ #define JucePlugin_AAXIdentifier          com.annieshin.StereoSourceSeparation
 #endif
 #ifndef  JucePlugin_AAXManufacturerCode
  #define JucePlugin_AAXManufacturerCode    JucePlugin_ManufacturerCode
@@ -324,4 +324,4 @@
  #define JucePlugin_AAXDisableMultiMono    0
 #endif
 
-#endif  // __JUCE_APPCONFIG_RWORPQ__
+#endif  // __JUCE_APPCONFIG_E5BN8L__

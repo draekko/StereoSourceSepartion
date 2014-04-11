@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AA29FBA7D1CA64257556C717"
+               BlueprintIdentifier = "9E57AABCA66342987D217639"
                BuildableName = "StereoSourceSeparation.component"
                BlueprintName = "StereoSourceSeparation"
                ReferencedContainer = "container:StereoSourceSeparation.xcodeproj">
