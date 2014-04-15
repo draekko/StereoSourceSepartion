@@ -11,7 +11,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-#define FFT_SIZE 1024
+#define FFT_SIZE 4096
 
 
 //==============================================================================
@@ -26,15 +26,6 @@ StereoSourceSeparationAudioProcessor::StereoSourceSeparationAudioProcessor()
     outputBufferLength_ = FFT_SIZE*2;
     inputBufferWritePosition_ = outputBufferWritePosition_ = outputBufferReadPosition_ = 0;
     samplesSinceLastFFT_ = 0;
-    
-    float* outputBufferData[NUM_CHANNELS];
-    outputBufferData[0] = outputBuffer_.getWritePointer(0);
-    outputBufferData[1] = outputBuffer_.getWritePointer(1);
-    for (int i = 0; i<outputBufferLength_; i++) {
-        outputBufferData[0][i] = 0;
-        outputBufferData[1][i] = 0;
-    }
-    
     
 }
 
@@ -153,6 +144,15 @@ void StereoSourceSeparationAudioProcessor::prepareToPlay (double sampleRate, int
     for (int c = 0; c<NUM_CHANNELS; c++) {
         processBuffer_[c] = new float[BLOCK_SIZE];
     }
+    for (int i = 0; i<BLOCK_SIZE; i++) {
+        processBuffer_[0][i] = 0;
+        processBuffer_[1][i] = 0;
+    }
+    
+    inputBuffer_.clear();
+    outputBuffer_.clear();
+    inputBufferWritePosition_ = outputBufferWritePosition_ = outputBufferReadPosition_ = 0;
+    samplesSinceLastFFT_ = 0;
 }
 
 void StereoSourceSeparationAudioProcessor::releaseResources()
