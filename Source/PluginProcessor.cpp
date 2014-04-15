@@ -14,6 +14,9 @@
 
 //==============================================================================
 StereoSourceSeparationAudioProcessor::StereoSourceSeparationAudioProcessor()
+    :NUM_CHANNELS(2),
+    BLOCK_SIZE(4096),
+    HOP_SIZE(1024)
 {
 }
 
@@ -127,16 +130,21 @@ void StereoSourceSeparationAudioProcessor::prepareToPlay (double sampleRate, int
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+    separator_ = new ADRess(BLOCK_SIZE, 100);
 }
 
 void StereoSourceSeparationAudioProcessor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
+    delete separator_;
 }
 
 void StereoSourceSeparationAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
+    const int numSamples = buffer.getNumSamples();
+    int inWritePos, samplesSinceFft, outReadPos, outWritePos;
+    
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...
     for (int channel = 0; channel < getNumInputChannels(); ++channel)

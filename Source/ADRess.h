@@ -10,36 +10,49 @@
 #define __StereoSourceSeparation__ADRess__
 
 #include <iostream>
-#include "kiss_fft.h"
+#include "kiss_fftr.h"
+#include <cmath>
+#include <complex>
+
+using std::complex;
 
 class ADRess
 {
 public:
     ADRess (int blockSize, int beta);
     ~ADRess ();
-    void setParameter (int index, int newValue);
-    void processBlock (float* leftChannelData, float* rightChannelData);
     
-    enum Parameters
-    {
-        d = 0,
-        H,
-        LR
-    };
+    void setDirection(int newDirection);
+    void setWidth(int newWidth);
     
-    enum kLeftRightChannel_t
+    void process (float* leftData, float* rightData);
+    
+    enum Status
     {
-        kLeftChannel = 0,
-        kRightChannel
+        kDisabled,
+        kSolo,
+        kMute
     };
     
 private:
-    int blockSize_;
-    int beta_;
+    const int BLOCK_SIZE;
+    const int BETA;
+    Status status_;
     int d_;
     int H_;
     float* windowBuffer_;
-    int LR_;
+    int LR_;   // 0 for left, 1 for right
+    
+    kiss_fftr_cfg fwd_;
+    kiss_fftr_cfg inv_;
+    
+    complex<float>* leftSpectrum_;
+    complex<float>* rightSpectrum_;
+    
+    float* leftMag_;
+    float* rightMag_;
+    float* leftPhase_;
+    float* rightPhase_;
 };
 
 #endif /* defined(__StereoSourceSeparation__ADRess__) */
