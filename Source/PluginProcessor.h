@@ -79,6 +79,8 @@ private:
     int outputBufferLength_;
     int outputBufferReadPosition_, outputBufferWritePosition_;
     
+    float** processBuffer_;
+    
     ADRess* separator_;
     
     int samplesSinceLastFFT_;

@@ -29,7 +29,7 @@ public:
     
     enum Status
     {
-        kDisabled,
+        kBypass,
         kSolo,
         kMute
     };
@@ -37,7 +37,7 @@ public:
 private:
     const int BLOCK_SIZE;
     const int BETA;
-    Status status_;
+    Status currStatus_;
     int d_;
     int H_;
     float* windowBuffer_;

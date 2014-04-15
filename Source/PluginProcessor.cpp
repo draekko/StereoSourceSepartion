@@ -11,13 +11,31 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+#define FFT_SIZE 1024
+
 
 //==============================================================================
 StereoSourceSeparationAudioProcessor::StereoSourceSeparationAudioProcessor()
     :NUM_CHANNELS(2),
-    BLOCK_SIZE(4096),
-    HOP_SIZE(1024)
+    BLOCK_SIZE(FFT_SIZE),
+    HOP_SIZE(FFT_SIZE/2),
+    inputBuffer_(2,FFT_SIZE),
+    outputBuffer_(2,FFT_SIZE*2)
 {
+    inputBufferLength_ = FFT_SIZE;
+    outputBufferLength_ = FFT_SIZE*2;
+    inputBufferWritePosition_ = outputBufferWritePosition_ = outputBufferReadPosition_ = 0;
+    samplesSinceLastFFT_ = 0;
+    
+    float* outputBufferData[NUM_CHANNELS];
+    outputBufferData[0] = outputBuffer_.getWritePointer(0);
+    outputBufferData[1] = outputBuffer_.getWritePointer(1);
+    for (int i = 0; i<outputBufferLength_; i++) {
+        outputBufferData[0][i] = 0;
+        outputBufferData[1][i] = 0;
+    }
+    
+    
 }
 
 StereoSourceSeparationAudioProcessor::~StereoSourceSeparationAudioProcessor()
@@ -131,6 +149,10 @@ void StereoSourceSeparationAudioProcessor::prepareToPlay (double sampleRate, int
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
     separator_ = new ADRess(BLOCK_SIZE, 100);
+    processBuffer_ = new float*[NUM_CHANNELS];
+    for (int c = 0; c<NUM_CHANNELS; c++) {
+        processBuffer_[c] = new float[BLOCK_SIZE];
+    }
 }
 
 void StereoSourceSeparationAudioProcessor::releaseResources()
@@ -138,21 +160,72 @@ void StereoSourceSeparationAudioProcessor::releaseResources()
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
     delete separator_;
+    for (int c = 0; c<NUM_CHANNELS; c++) {
+        delete [] processBuffer_[c];
+    }
+    delete [] processBuffer_;
 }
 
 void StereoSourceSeparationAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
     const int numSamples = buffer.getNumSamples();
-    int inWritePos, samplesSinceFft, outReadPos, outWritePos;
     
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    for (int channel = 0; channel < getNumInputChannels(); ++channel)
-    {
-        float* channelData = buffer.getWritePointer (channel);
-
-        // ..do something to the data...
+    float* stereoData[NUM_CHANNELS];
+    stereoData[0] = buffer.getWritePointer(0);
+    stereoData[1] = buffer.getWritePointer(1);
+    float* inputBufferData[NUM_CHANNELS];
+    inputBufferData[0] = inputBuffer_.getWritePointer(0);
+    inputBufferData[1] = inputBuffer_.getWritePointer(1);
+    float* outputBufferData[NUM_CHANNELS];
+    outputBufferData[0] = outputBuffer_.getWritePointer(0);
+    outputBufferData[1] = outputBuffer_.getWritePointer(1);
+    
+    for (int i = 0; i<numSamples; i++) {
+        
+        // store input sample data, output sample from output buffer, then clear output buffer sample
+        inputBufferData[0][inputBufferWritePosition_] = stereoData[0][i];
+        inputBufferData[1][inputBufferWritePosition_] = stereoData[1][i];
+        if (++inputBufferWritePosition_ >= inputBufferLength_)
+            inputBufferWritePosition_ = 0;
+        
+        stereoData[0][i] = outputBufferData[0][outputBufferReadPosition_];
+        stereoData[1][i] = outputBufferData[1][outputBufferReadPosition_];
+        
+        outputBufferData[0][outputBufferReadPosition_] = 0.0;
+        outputBufferData[1][outputBufferReadPosition_] = 0.0;
+        if (++outputBufferReadPosition_ >= outputBufferLength_)
+            outputBufferReadPosition_ = 0;
+        
+        // samples since last fft exceeds hopsize, do fft
+        if (++samplesSinceLastFFT_ >= HOP_SIZE) {
+            samplesSinceLastFFT_ = 0;
+            
+            // find start positino in input buffer, then load the process buffer leftData_ and rightData_
+            int inputBufferIndex = (inputBufferWritePosition_ - BLOCK_SIZE + inputBufferLength_) % inputBufferLength_;
+            for (int procBufferIndex = 0; procBufferIndex < BLOCK_SIZE; procBufferIndex++) {
+                processBuffer_[0][procBufferIndex] = inputBufferData[0][inputBufferIndex];
+                processBuffer_[1][procBufferIndex] = inputBufferData[1][inputBufferIndex];
+                if ( ++inputBufferIndex >= inputBufferLength_)
+                    inputBufferIndex = 0;
+            }
+            
+            separator_->process(processBuffer_[0], processBuffer_[1]);
+            
+            int outputBufferIndex = outputBufferWritePosition_;
+            for (int procBufferIndex = 0; procBufferIndex < BLOCK_SIZE; procBufferIndex++) {
+                outputBufferData[0][outputBufferIndex] += processBuffer_[0][procBufferIndex];
+                outputBufferData[1][outputBufferIndex] += processBuffer_[1][procBufferIndex];
+                
+                if (++outputBufferIndex >= outputBufferLength_)
+                    outputBufferIndex = 0;
+            }
+            
+            // advance write position by hop size
+            outputBufferWritePosition_ = (outputBufferWritePosition_ + HOP_SIZE) % outputBufferLength_;
+        }
+        
     }
+    
 
     // In case we have more outputs than inputs, we'll clear any output
     // channels that didn't contain input data, (because these aren't

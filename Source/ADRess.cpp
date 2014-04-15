@@ -10,7 +10,7 @@
 
 ADRess::ADRess(int blockSize, int beta):BLOCK_SIZE(blockSize),BETA(beta)
 {
-    status_ = kSolo;
+    currStatus_ = kSolo;
     d_ = 50;
     H_ = 0;
     LR_ = 0;
@@ -72,7 +72,7 @@ void ADRess::process(float *leftData, float *rightData)
         rightData[i] *= windowBuffer_[i];
     }
     
-    if (status_ != kDisabled) {
+    if (currStatus_ != kBypass) {
         
         // do fft
         kiss_fftr(fwd_, (kiss_fft_scalar*)leftData,  (kiss_fft_cpx*)leftSpectrum_);
