@@ -8,11 +8,13 @@
 
 #include "ADRess.h"
 
+#define SCALE_DOWN_FACTOR 1
+
 ADRess::ADRess(int blockSize, int beta):BLOCK_SIZE(blockSize),BETA(beta)
 {
     currStatus_ = kSolo;
-    d_ = 50;
-    H_ = 0;
+    d_ = 15;
+    H_ = 30;
     LR_ = 0;
     
     // Hann window
@@ -32,10 +34,22 @@ ADRess::ADRess(int blockSize, int beta):BLOCK_SIZE(blockSize),BETA(beta)
     rightMag_ = new float[BLOCK_SIZE/2+1];
     leftPhase_ = new float[BLOCK_SIZE/2+1];
     rightPhase_ = new float[BLOCK_SIZE/2+1];
+    
+    resynMag_ = new float[BLOCK_SIZE/2+1];
+    
+    minIndices_ = new int[BLOCK_SIZE/2+1];
+    minValues_ = new float[BLOCK_SIZE/2+1];
+    maxValues_ = new float[BLOCK_SIZE/2+1];
+    
+    azimuth_ = new float*[BLOCK_SIZE/2+1];
+    for (int n = 0; n<BLOCK_SIZE/2+1; n++)
+        azimuth_[n] = new float[BETA+1];
+    
 }
 
 ADRess::~ADRess()
 {
+    delete [] resynMag_;
     delete [] windowBuffer_;
     delete [] leftSpectrum_;
     delete [] rightSpectrum_;
@@ -43,6 +57,13 @@ ADRess::~ADRess()
     delete [] rightMag_;
     delete [] leftPhase_;
     delete [] rightPhase_;
+    delete [] minIndices_;
+    delete [] minValues_;
+    delete [] maxValues_;
+    
+    for (int n = 0; n<BLOCK_SIZE/2+1; n++)
+        delete [] azimuth_[n];
+    delete [] azimuth_;
 }
 
 void ADRess::setDirection(int newDirection)
@@ -86,21 +107,109 @@ void ADRess::process(float *leftData, float *rightData)
             rightPhase_[i] = std::arg(rightSpectrum_[i]);
         }
         
-        // convert complex to real-imaginary representation
-        for (int i = 0; i<BLOCK_SIZE/2+1; i++) {
-            leftSpectrum_[i] = std::polar(leftMag_[i], leftPhase_[i]);
-            rightSpectrum_[i] = std::polar(rightMag_[i], rightPhase_[i]);
+        
+        // generate right or left azimuth
+        if (LR_) { // when right channel dominates
+            for (int n = 0; n<BLOCK_SIZE/2+1; n++)
+                for (int g = 0; g<=BETA; g++)
+                    azimuth_[n][g] = std::abs(leftSpectrum_[n] - rightSpectrum_[n]*(float)2.0*(float)g/(float)BETA);
+            
+        } else {   // when left channel dominates
+            for (int n = 0; n<BLOCK_SIZE/2+1; n++)
+                for (int g = 0; g<=BETA; g++)
+                    azimuth_[n][g] = std::abs(rightSpectrum_[n] - leftSpectrum_[n]*(float)2.0*(float)g/(float)BETA);
         }
         
-        // do inverse fft
-        kiss_fftri(inv_, (kiss_fft_cpx*)leftSpectrum_, (kiss_fft_scalar*)leftData);
-        kiss_fftri(inv_, (kiss_fft_cpx*)rightSpectrum_, (kiss_fft_scalar*)rightData);
+        // find azimuth minima and turn them to peaks
+        for (int n = 0; n<BLOCK_SIZE/2+1; n++) {
+            getMinimum(n, azimuth_[n]);
+            getMaximum(n, azimuth_[n]);
+            
+            for (int g = 0; g<=BETA; g++)
+                azimuth_[n][g] = 0;
+            
+            azimuth_[n][minIndices_[n]] = maxValues_[n] - minValues_[n];
+            
+            resynMag_[n] = sumUpPeaks(azimuth_[n]);
+        }
         
-        // scale down ifft results
+        
+        
+        if (LR_) {
+            for (int i = 0; i<BLOCK_SIZE/2+1; i++)
+                rightSpectrum_[i] = std::polar(resynMag_[i], rightPhase_[i]);
+            
+            kiss_fftri(inv_, (kiss_fft_cpx*)rightSpectrum_, (kiss_fft_scalar*)rightData);
+            memcpy(leftData, rightData, BLOCK_SIZE*sizeof(float));
+            
+        } else {
+            for (int i = 0; i<BLOCK_SIZE/2+1; i++)
+                leftSpectrum_[i] = std::polar(resynMag_[i], leftPhase_[i]);
+            
+            kiss_fftri(inv_, (kiss_fft_cpx*)leftSpectrum_, (kiss_fft_scalar*)leftData);
+            memcpy(rightData, leftData, BLOCK_SIZE*sizeof(float));
+        }
+        
+        
+        // scale down ifft results and windowing
         for (int i = 0; i<BLOCK_SIZE; i++) {
-            leftData[i] /= BLOCK_SIZE;
-            rightData[i] /= BLOCK_SIZE;
+            leftData[i] = leftData[i]*windowBuffer_[i]/BLOCK_SIZE/SCALE_DOWN_FACTOR;
+            rightData[i] = rightData[i]*windowBuffer_[i]/BLOCK_SIZE/SCALE_DOWN_FACTOR;
         }
         
     }
+}
+
+void ADRess::getMinimum(int nthBin, float *nthBinAzm)
+{
+    int minIndex = 0;
+    float minValue = nthBinAzm[0];
+    
+    for (int i = 1; i<=BETA; i++) {
+        if (nthBinAzm[i] < minValue) {
+            minIndex = i;
+            minValue = nthBinAzm[i];
+        }
+    }
+    
+    minIndices_[nthBin] = minIndex;
+    minValues_[nthBin] = minValue;
+}
+
+void ADRess::getMaximum(int nthBin, float *nthBinAzm)
+{
+    float maxValue = nthBinAzm[0];
+    
+    for (int i = 1; i<=BETA; i++)
+        if (nthBinAzm[i]>maxValue)
+            maxValue = nthBinAzm[i];
+    
+    maxValues_[nthBin] = maxValue;
+}
+
+float ADRess::sumUpPeaks(float *nthBinAzm)
+{
+    float sum = 0;
+    
+    int startInd = std::max(0, d_-H_/2);
+    int endInd = std::min(BETA, d_+H_/2);
+    
+    switch (currStatus_) {
+        case kSolo:
+            for (int i = startInd; i<=endInd; i++)
+                sum += nthBinAzm[i];
+            break;
+            
+        case kMute:
+            for (int i = 0; i<=BETA; i++)
+                if (i<startInd || i>endInd)
+                    sum += nthBinAzm[i];
+            break;
+            
+        case kBypass:
+        default:
+            break;
+    }
+    
+    return sum;
 }

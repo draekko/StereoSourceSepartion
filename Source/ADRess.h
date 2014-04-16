@@ -40,6 +40,7 @@ private:
     Status currStatus_;
     int d_;
     int H_;
+    float* resynMag_;
     float* windowBuffer_;
     int LR_;   // 0 for left, 1 for right
     
@@ -53,6 +54,16 @@ private:
     float* rightMag_;
     float* leftPhase_;
     float* rightPhase_;
+    
+    int*  minIndices_;
+    float* minValues_;
+    float* maxValues_;
+    
+    float** azimuth_;
+    
+    void getMinimum(int nthBin, float* nthBinAzm);
+    void getMaximum(int nthBin, float* nthBinAzm);
+    float sumUpPeaks(float* nthBinAzm);
 };
 
 #endif /* defined(__StereoSourceSeparation__ADRess__) */

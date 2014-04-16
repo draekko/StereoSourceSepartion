@@ -17,7 +17,7 @@
 StereoSourceSeparationAudioProcessor::StereoSourceSeparationAudioProcessor()
     :NUM_CHANNELS(2),
     BLOCK_SIZE(FFT_SIZE),
-    HOP_SIZE(FFT_SIZE/2),
+    HOP_SIZE(FFT_SIZE/4),
     inputBuffer_(2,FFT_SIZE),
     outputBuffer_(2,FFT_SIZE*2),
     processBuffer_(2, FFT_SIZE)
@@ -155,7 +155,7 @@ void StereoSourceSeparationAudioProcessor::releaseResources()
 
 void StereoSourceSeparationAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
-    
+    // get pointers for buffer access
     float* stereoData[NUM_CHANNELS];
     stereoData[0] = buffer.getWritePointer(0);
     stereoData[1] = buffer.getWritePointer(1);
@@ -172,21 +172,23 @@ void StereoSourceSeparationAudioProcessor::processBlock (AudioSampleBuffer& buff
     
     for (int i = 0; i<buffer.getNumSamples(); i++) {
         
-        // store input sample data, output sample from output buffer, then clear output buffer sample
+        // store input sample data in input buffer
         inputBufferData[0][inputBufferWritePosition_] = stereoData[0][i];
         inputBufferData[1][inputBufferWritePosition_] = stereoData[1][i];
         if (++inputBufferWritePosition_ >= inputBufferLength_)
             inputBufferWritePosition_ = 0;
         
+        // output sample from output buffer
         stereoData[0][i] = outputBufferData[0][outputBufferReadPosition_];
         stereoData[1][i] = outputBufferData[1][outputBufferReadPosition_];
         
+        // clear output buffer sample in preparation for next overlap and add
         outputBufferData[0][outputBufferReadPosition_] = 0.0;
         outputBufferData[1][outputBufferReadPosition_] = 0.0;
         if (++outputBufferReadPosition_ >= outputBufferLength_)
             outputBufferReadPosition_ = 0;
         
-        // samples since last fft exceeds hopsize, do fft
+        // if samples since last fft exceeds hopsize, do fft
         if (++samplesSinceLastFFT_ >= HOP_SIZE) {
             samplesSinceLastFFT_ = 0;
             
@@ -202,6 +204,7 @@ void StereoSourceSeparationAudioProcessor::processBlock (AudioSampleBuffer& buff
             // performs source separation here
             separator_->process(processBufferData[0], processBufferData[1]);
             
+            // overlap and add in output buffer
             int outputBufferIndex = outputBufferWritePosition_;
             for (int procBufferIndex = 0; procBufferIndex < BLOCK_SIZE; procBufferIndex++) {
                 outputBufferData[0][outputBufferIndex] += processBufferData[0][procBufferIndex];
