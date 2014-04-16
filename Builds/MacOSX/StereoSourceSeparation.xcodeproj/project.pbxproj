@@ -25,6 +25,7 @@
 		40B130D7EFD989E70812D6D1 /* CAStreamBasicDescription.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CE1A63CFE7DB724CB77D9CA7 /* CAStreamBasicDescription.cpp */; settings = {COMPILER_FLAGS = "-w"; }; };
 		44E264AD95CBEA668B5CD4D9 /* MusicDeviceBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ECB659F64EB223DDCC800761 /* MusicDeviceBase.cpp */; settings = {COMPILER_FLAGS = "-w"; }; };
 		504810AA50E6D1315FCDFF61 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CAECE59206CCB29327E985B0 /* AudioUnit.framework */; };
+		541B7D8D18FF26D30048A301 /* DirectionComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 541B7D8B18FF26D30048A301 /* DirectionComponent.cpp */; };
 		545C0F3A18F86CD500E3A034 /* kiss_fft.c in Sources */ = {isa = PBXBuildFile; fileRef = 545C0F3518F86CD500E3A034 /* kiss_fft.c */; };
 		545C0F3B18F86CD500E3A034 /* kiss_fftr.c in Sources */ = {isa = PBXBuildFile; fileRef = 545C0F3718F86CD500E3A034 /* kiss_fftr.c */; };
 		545C0F3E18F86CE700E3A034 /* ADRess.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 545C0F3C18F86CE700E3A034 /* ADRess.cpp */; };
@@ -395,6 +396,8 @@
 		53E9C1DC3C9154AEE1212B71 /* juce_CharacterFunctions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = juce_CharacterFunctions.h; path = ../../JuceLibraryCode/modules/juce_core/text/juce_CharacterFunctions.h; sourceTree = SOURCE_ROOT; };
 		53FE6CBD9FC8D48D1F084436 /* AUScopeElement.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AUScopeElement.h; path = Extras/CoreAudio/AudioUnits/AUPublic/AUBase/AUScopeElement.h; sourceTree = DEVELOPER_DIR; };
 		5416EF534F92A0A106D7EDED /* juce_StretchableLayoutResizerBar.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = juce_StretchableLayoutResizerBar.cpp; path = ../../JuceLibraryCode/modules/juce_gui_basics/layout/juce_StretchableLayoutResizerBar.cpp; sourceTree = SOURCE_ROOT; };
+		541B7D8B18FF26D30048A301 /* DirectionComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DirectionComponent.cpp; path = ../../Source/DirectionComponent.cpp; sourceTree = "<group>"; };
+		541B7D8C18FF26D30048A301 /* DirectionComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DirectionComponent.h; path = ../../Source/DirectionComponent.h; sourceTree = "<group>"; };
 		545C0F3418F86CD500E3A034 /* _kiss_fft_guts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _kiss_fft_guts.h; sourceTree = "<group>"; };
 		545C0F3518F86CD500E3A034 /* kiss_fft.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kiss_fft.c; sourceTree = "<group>"; };
 		545C0F3618F86CD500E3A034 /* kiss_fft.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kiss_fft.h; sourceTree = "<group>"; };
@@ -1718,6 +1721,8 @@
 		6C065161D0DC376FC36D0FBD /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				541B7D8B18FF26D30048A301 /* DirectionComponent.cpp */,
+				541B7D8C18FF26D30048A301 /* DirectionComponent.h */,
 				545C0F3C18F86CE700E3A034 /* ADRess.cpp */,
 				545C0F3D18F86CE700E3A034 /* ADRess.h */,
 				53DE14C2C290F6777F3A6012 /* PluginProcessor.cpp */,
@@ -3036,6 +3041,7 @@
 				9717ECD5190F0F387A37B446 /* juce_PluginUtilities.cpp in Sources */,
 				545C0F3E18F86CE700E3A034 /* ADRess.cpp in Sources */,
 				3B49243295E893E2CC9C5463 /* juce_RTAS_DigiCode1.cpp in Sources */,
+				541B7D8D18FF26D30048A301 /* DirectionComponent.cpp in Sources */,
 				965A56AB9673778DD2B955CC /* juce_RTAS_DigiCode2.cpp in Sources */,
 				727A5508A88BB819DFBACEA2 /* juce_RTAS_DigiCode3.cpp in Sources */,
 				293E8B9D01C554AE02F86118 /* juce_RTAS_MacUtilities.mm in Sources */,

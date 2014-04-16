@@ -35,7 +35,6 @@ void StereoSourceSeparationAudioProcessorEditor::paint (Graphics& g)
 void StereoSourceSeparationAudioProcessorEditor::resized()
 {
     directionComponent->setBounds(0, 0, getWidth(), (int)(getHeight()*4/5));
-    ampSlider.setBounds(0, getHeight()*4/5, 100, 100);
 }
 
 void StereoSourceSeparationAudioProcessorEditor::timerCallback()
