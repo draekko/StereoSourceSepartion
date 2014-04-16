@@ -79,7 +79,7 @@ private:
     int outputBufferLength_;
     int outputBufferReadPosition_, outputBufferWritePosition_;
     
-    float** processBuffer_;
+    AudioSampleBuffer processBuffer_;
     
     ADRess* separator_;
     

@@ -13,20 +13,17 @@
 
 #define FFT_SIZE 4096
 
-
 //==============================================================================
 StereoSourceSeparationAudioProcessor::StereoSourceSeparationAudioProcessor()
     :NUM_CHANNELS(2),
     BLOCK_SIZE(FFT_SIZE),
     HOP_SIZE(FFT_SIZE/2),
     inputBuffer_(2,FFT_SIZE),
-    outputBuffer_(2,FFT_SIZE*2)
+    outputBuffer_(2,FFT_SIZE*2),
+    processBuffer_(2, FFT_SIZE)
 {
     inputBufferLength_ = FFT_SIZE;
     outputBufferLength_ = FFT_SIZE*2;
-    inputBufferWritePosition_ = outputBufferWritePosition_ = outputBufferReadPosition_ = 0;
-    samplesSinceLastFFT_ = 0;
-    
 }
 
 StereoSourceSeparationAudioProcessor::~StereoSourceSeparationAudioProcessor()
@@ -140,18 +137,12 @@ void StereoSourceSeparationAudioProcessor::prepareToPlay (double sampleRate, int
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
     separator_ = new ADRess(BLOCK_SIZE, 100);
-    processBuffer_ = new float*[NUM_CHANNELS];
-    for (int c = 0; c<NUM_CHANNELS; c++) {
-        processBuffer_[c] = new float[BLOCK_SIZE];
-    }
-    for (int i = 0; i<BLOCK_SIZE; i++) {
-        processBuffer_[0][i] = 0;
-        processBuffer_[1][i] = 0;
-    }
     
     inputBuffer_.clear();
     outputBuffer_.clear();
-    inputBufferWritePosition_ = outputBufferWritePosition_ = outputBufferReadPosition_ = 0;
+    processBuffer_.clear();
+    inputBufferWritePosition_ = outputBufferWritePosition_ = 0;
+    outputBufferReadPosition_ = (outputBufferLength_ - HOP_SIZE - 1) % outputBufferLength_;
     samplesSinceLastFFT_ = 0;
 }
 
@@ -160,15 +151,10 @@ void StereoSourceSeparationAudioProcessor::releaseResources()
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
     delete separator_;
-    for (int c = 0; c<NUM_CHANNELS; c++) {
-        delete [] processBuffer_[c];
-    }
-    delete [] processBuffer_;
 }
 
 void StereoSourceSeparationAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
-    const int numSamples = buffer.getNumSamples();
     
     float* stereoData[NUM_CHANNELS];
     stereoData[0] = buffer.getWritePointer(0);
@@ -179,8 +165,12 @@ void StereoSourceSeparationAudioProcessor::processBlock (AudioSampleBuffer& buff
     float* outputBufferData[NUM_CHANNELS];
     outputBufferData[0] = outputBuffer_.getWritePointer(0);
     outputBufferData[1] = outputBuffer_.getWritePointer(1);
+    float* processBufferData[NUM_CHANNELS];
+    processBufferData[0] = processBuffer_.getWritePointer(0);
+    processBufferData[1] = processBuffer_.getWritePointer(1);
     
-    for (int i = 0; i<numSamples; i++) {
+    
+    for (int i = 0; i<buffer.getNumSamples(); i++) {
         
         // store input sample data, output sample from output buffer, then clear output buffer sample
         inputBufferData[0][inputBufferWritePosition_] = stereoData[0][i];
@@ -203,19 +193,19 @@ void StereoSourceSeparationAudioProcessor::processBlock (AudioSampleBuffer& buff
             // find start positino in input buffer, then load the process buffer leftData_ and rightData_
             int inputBufferIndex = (inputBufferWritePosition_ - BLOCK_SIZE + inputBufferLength_) % inputBufferLength_;
             for (int procBufferIndex = 0; procBufferIndex < BLOCK_SIZE; procBufferIndex++) {
-                processBuffer_[0][procBufferIndex] = inputBufferData[0][inputBufferIndex];
-                processBuffer_[1][procBufferIndex] = inputBufferData[1][inputBufferIndex];
+                processBufferData[0][procBufferIndex] = inputBufferData[0][inputBufferIndex];
+                processBufferData[1][procBufferIndex] = inputBufferData[1][inputBufferIndex];
                 if ( ++inputBufferIndex >= inputBufferLength_)
                     inputBufferIndex = 0;
             }
             
-            separator_->process(processBuffer_[0], processBuffer_[1]);
+            // performs source separation here
+            separator_->process(processBufferData[0], processBufferData[1]);
             
             int outputBufferIndex = outputBufferWritePosition_;
             for (int procBufferIndex = 0; procBufferIndex < BLOCK_SIZE; procBufferIndex++) {
-                outputBufferData[0][outputBufferIndex] += processBuffer_[0][procBufferIndex];
-                outputBufferData[1][outputBufferIndex] += processBuffer_[1][procBufferIndex];
-                
+                outputBufferData[0][outputBufferIndex] += processBufferData[0][procBufferIndex];
+                outputBufferData[1][outputBufferIndex] += processBufferData[1][procBufferIndex];
                 if (++outputBufferIndex >= outputBufferLength_)
                     outputBufferIndex = 0;
             }
