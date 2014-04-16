@@ -18,6 +18,7 @@ StereoSourceSeparationAudioProcessor::StereoSourceSeparationAudioProcessor()
     :NUM_CHANNELS(2),
     BLOCK_SIZE(FFT_SIZE),
     HOP_SIZE(FFT_SIZE/4),
+    BETA(100),
     inputBuffer_(2,FFT_SIZE),
     outputBuffer_(2,FFT_SIZE*2),
     processBuffer_(2, FFT_SIZE)
@@ -176,7 +177,7 @@ void StereoSourceSeparationAudioProcessor::prepareToPlay (double sampleRate, int
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    separator_ = new ADRess(BLOCK_SIZE, 100);
+    separator_ = new ADRess(BLOCK_SIZE, BETA);
     
     inputBuffer_.clear();
     outputBuffer_.clear();

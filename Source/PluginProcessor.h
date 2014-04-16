@@ -78,6 +78,7 @@ private:
     const int NUM_CHANNELS;
     const int BLOCK_SIZE;
     const int HOP_SIZE;
+    const int BETA;
     
     AudioSampleBuffer inputBuffer_;
     int inputBufferLength_;
