@@ -22,22 +22,27 @@ public:
     ADRess (int blockSize, int beta);
     ~ADRess ();
     
-    void setDirection(int newDirection);
-    void setWidth(int newWidth);
-    
-    void process (float* leftData, float* rightData);
-    
-    enum Status
+    enum Status_t
     {
         kBypass,
         kSolo,
         kMute
     };
     
+    void setStatus(Status_t newStatus);
+    void setDirection(int newDirection);
+    void setWidth(int newWidth);
+    
+    const Status_t getStatus();
+    const int getDirection();
+    const int getWidth();
+    
+    void process (float* leftData, float* rightData);
+    
 private:
     const int BLOCK_SIZE;
     const int BETA;
-    Status currStatus_;
+    Status_t currStatus_;
     int d_;
     int H_;
     float* resynMag_;

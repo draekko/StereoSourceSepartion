@@ -66,6 +66,11 @@ ADRess::~ADRess()
     delete [] azimuth_;
 }
 
+void ADRess::setStatus(Status_t newStatus)
+{
+    currStatus_ = newStatus;
+}
+
 void ADRess::setDirection(int newDirection)
 {
     if (newDirection <= BETA/2) {
@@ -84,6 +89,24 @@ void ADRess::setWidth(int newWidth)
     H_ = newWidth;
 }
 
+const ADRess::Status_t ADRess::getStatus()
+{
+    return currStatus_;
+}
+
+const int ADRess::getDirection()
+{
+    if (LR_) {
+        return BETA - d_;
+    } else {
+        return d_;
+    }
+}
+
+const int ADRess::getWidth()
+{
+    return H_;
+}
 
 void ADRess::process(float *leftData, float *rightData)
 {

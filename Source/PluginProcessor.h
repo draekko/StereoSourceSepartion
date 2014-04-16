@@ -24,6 +24,14 @@ public:
     StereoSourceSeparationAudioProcessor();
     ~StereoSourceSeparationAudioProcessor();
 
+    enum Parameters
+    {
+        kStatus,
+        kDirection,
+        kWidth,
+        kNumParameters
+    };
+    
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock);
     void releaseResources();

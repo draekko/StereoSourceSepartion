@@ -38,26 +38,66 @@ const String StereoSourceSeparationAudioProcessor::getName() const
 
 int StereoSourceSeparationAudioProcessor::getNumParameters()
 {
-    return 0;
+    return kNumParameters;
 }
 
 float StereoSourceSeparationAudioProcessor::getParameter (int index)
 {
-    return 0.0f;
+    switch (index) {
+        case kStatus:
+            return (float)separator_->getStatus();
+            
+        case kDirection:
+            return (float)separator_->getDirection();
+            
+        case kWidth:
+            return (float)separator_->getWidth();
+            
+        default:
+            return 0.0f;
+    }
 }
 
 void StereoSourceSeparationAudioProcessor::setParameter (int index, float newValue)
 {
+    switch (index) {
+        case kStatus:
+            separator_->setStatus( static_cast<ADRess::Status_t>(newValue) );
+            break;
+            
+        case kDirection:
+            separator_->setDirection( static_cast<int>(newValue) );
+            break;
+            
+        case kWidth:
+            separator_->setWidth( static_cast<int>(newValue) );
+            break;
+            
+        default:
+            break;
+    }
 }
 
 const String StereoSourceSeparationAudioProcessor::getParameterName (int index)
 {
-    return String::empty;
+    switch (index) {
+        case kStatus:
+            return "Status";
+            
+        case kDirection:
+            return "Direction";
+            
+        case kWidth:
+            return "Width";
+            
+        default:
+            return String::empty;
+    }
 }
 
 const String StereoSourceSeparationAudioProcessor::getParameterText (int index)
 {
-    return String::empty;
+    return String(getParameter(index));
 }
 
 const String StereoSourceSeparationAudioProcessor::getInputChannelName (int channelIndex) const
