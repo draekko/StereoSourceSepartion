@@ -14,23 +14,41 @@
 
 //==============================================================================
 StereoSourceSeparationAudioProcessorEditor::StereoSourceSeparationAudioProcessorEditor (StereoSourceSeparationAudioProcessor* ownerFilter)
-    : AudioProcessorEditor (ownerFilter)
+    : AudioProcessorEditor (ownerFilter),
+      directionComponent()
 {
-    // This is where our plugin's editor size is set.
-    setSize (400, 300);
+    addAndMakeVisible(directionComponent = new DirectionComponent());
+    setSize (900, 600);
 }
 
 StereoSourceSeparationAudioProcessorEditor::~StereoSourceSeparationAudioProcessorEditor()
 {
+    directionComponent = nullptr;
 }
 
 //==============================================================================
 void StereoSourceSeparationAudioProcessorEditor::paint (Graphics& g)
 {
-    g.fillAll (Colours::white);
-    g.setColour (Colours::black);
-    g.setFont (15.0f);
-    g.drawFittedText ("Hello World!",
-                      0, 0, getWidth(), getHeight(),
-                      Justification::centred, 1);
+    g.fillAll (Colours::darkgrey);
+}
+
+void StereoSourceSeparationAudioProcessorEditor::resized()
+{
+    directionComponent->setBounds(0, 0, getWidth(), (int)(getHeight()*4/5));
+    ampSlider.setBounds(0, getHeight()*4/5, 100, 100);
+}
+
+void StereoSourceSeparationAudioProcessorEditor::timerCallback()
+{
+    
+}
+
+void StereoSourceSeparationAudioProcessorEditor::sliderValueChanged (Slider* slider)
+{
+
+}
+
+void StereoSourceSeparationAudioProcessorEditor::buttonClicked (Button* buttonThatWasClicked)
+{
+
 }
