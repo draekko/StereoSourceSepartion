@@ -13,12 +13,15 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
-
+#include "DirectionComponent.h"
 
 //==============================================================================
 /**
 */
-class StereoSourceSeparationAudioProcessorEditor  : public AudioProcessorEditor
+class StereoSourceSeparationAudioProcessorEditor  : public AudioProcessorEditor,
+                                                    public ButtonListener,
+                                                    public SliderListener,
+                                                    public Timer
 {
 public:
     StereoSourceSeparationAudioProcessorEditor (StereoSourceSeparationAudioProcessor* ownerFilter);
@@ -26,7 +29,15 @@ public:
 
     //==============================================================================
     // This is just a standard Juce paint method...
-    void paint (Graphics& g);
+    void paint (Graphics&) override;
+    void resized() override;
+    void timerCallback() override;
+    void sliderValueChanged (Slider*) override;
+    void buttonClicked (Button* buttonThatWasClicked);
+
+private:
+    ScopedPointer<DirectionComponent> directionComponent;
+
 };
 
 
