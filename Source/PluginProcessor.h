@@ -12,7 +12,7 @@
 #define PLUGINPROCESSOR_H_INCLUDED
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "ADRess.h"
+
 
 //==============================================================================
 /**
@@ -24,14 +24,6 @@ public:
     StereoSourceSeparationAudioProcessor();
     ~StereoSourceSeparationAudioProcessor();
 
-    enum Parameters
-    {
-        kStatus,
-        kDirection,
-        kWidth,
-        kNumParameters
-    };
-    
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock);
     void releaseResources();
@@ -75,25 +67,6 @@ public:
     void setStateInformation (const void* data, int sizeInBytes);
 
 private:
-    const int NUM_CHANNELS;
-    const int BLOCK_SIZE;
-    const int HOP_SIZE;
-    const int BETA;
-    
-    AudioSampleBuffer inputBuffer_;
-    int inputBufferLength_;
-    int inputBufferWritePosition_;
-    
-    AudioSampleBuffer outputBuffer_;
-    int outputBufferLength_;
-    int outputBufferReadPosition_, outputBufferWritePosition_;
-    
-    AudioSampleBuffer processBuffer_;
-    
-    ADRess* separator_;
-    
-    int samplesSinceLastFFT_;
-    
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StereoSourceSeparationAudioProcessor)
 };

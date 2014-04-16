@@ -10,65 +10,36 @@
 #define __StereoSourceSeparation__ADRess__
 
 #include <iostream>
-#include "kiss_fftr.h"
-#include <cmath>
-#include <complex>
-
-using std::complex;
+#include "kiss_fft.h"
 
 class ADRess
 {
 public:
     ADRess (int blockSize, int beta);
     ~ADRess ();
+    void setParameter (int index, int newValue);
+    void processBlock (float* leftChannelData, float* rightChannelData);
     
-    enum Status_t
+    enum Parameters
     {
-        kBypass,
-        kSolo,
-        kMute
+        d = 0,
+        H,
+        LR
     };
     
-    void setStatus(Status_t newStatus);
-    void setDirection(int newDirection);
-    void setWidth(int newWidth);
-    
-    const Status_t getStatus();
-    const int getDirection();
-    const int getWidth();
-    
-    void process (float* leftData, float* rightData);
+    enum kLeftRightChannel_t
+    {
+        kLeftChannel = 0,
+        kRightChannel
+    };
     
 private:
-    const int BLOCK_SIZE;
-    const int BETA;
-    Status_t currStatus_;
+    int blockSize_;
+    int beta_;
     int d_;
     int H_;
-    float* resynMag_;
     float* windowBuffer_;
-    int LR_;   // 0 for left, 1 for right
-    
-    kiss_fftr_cfg fwd_;
-    kiss_fftr_cfg inv_;
-    
-    complex<float>* leftSpectrum_;
-    complex<float>* rightSpectrum_;
-    
-    float* leftMag_;
-    float* rightMag_;
-    float* leftPhase_;
-    float* rightPhase_;
-    
-    int*  minIndices_;
-    float* minValues_;
-    float* maxValues_;
-    
-    float** azimuth_;
-    
-    void getMinimum(int nthBin, float* nthBinAzm);
-    void getMaximum(int nthBin, float* nthBinAzm);
-    float sumUpPeaks(float* nthBinAzm);
+    int LR_;
 };
 
 #endif /* defined(__StereoSourceSeparation__ADRess__) */
