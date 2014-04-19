@@ -13,7 +13,6 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
-#include "DirectionComponent.h"
 #include <math.h>
 
 //==============================================================================
