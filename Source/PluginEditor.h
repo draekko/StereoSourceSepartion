@@ -14,6 +14,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
 #include "DirectionComponent.h"
+#include <math.h>
 
 //==============================================================================
 /**
@@ -21,7 +22,7 @@
 class StereoSourceSeparationAudioProcessorEditor  : public AudioProcessorEditor,
                                                     public ButtonListener,
                                                     public SliderListener,
-                                                    public Timer
+                                                    public MouseListener
 {
 public:
     StereoSourceSeparationAudioProcessorEditor (StereoSourceSeparationAudioProcessor* ownerFilter);
@@ -31,12 +32,23 @@ public:
     // This is just a standard Juce paint method...
     void paint (Graphics&) override;
     void resized() override;
-    void timerCallback() override;
+    void mouseDown (const juce::MouseEvent &e);
+    void mouseDrag(const juce::MouseEvent &e);
     void sliderValueChanged (Slider*) override;
     void buttonClicked (Button* buttonThatWasClicked);
 
 private:
-    ScopedPointer<DirectionComponent> directionComponent;
+    int width_;
+    int height_;
+    float dirAngle;
+    float widAngle;
+    float radius;
+    
+    
+    Path internalPath;
+    Path arrowPath;
+    Line<float> arrowLine;
+    ScopedPointer<Label> label;
 
 };
 

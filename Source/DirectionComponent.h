@@ -15,18 +15,29 @@
 
 #define _USE_MATH_DEFINES
 
-class DirectionComponent :  public Component
+class DirectionComponent :  public Component,
+                            public MouseListener
 {
 public:
-    DirectionComponent();
+    DirectionComponent(int width, int height);
     ~DirectionComponent();
     
     void paint (Graphics& g);
+    void resized();
+    void mouseDown (const MouseEvent& event);
     void setValue(float mVal);
     
 private:
+    int width_;
+    int height_;
     float dirAngle;
-    int radius;
+    float widAngle;
+    float radius;
+    
+    Path internalPath;
+    Path arrowPath;
+    Line<float> arrowLine;
+    
 };
 
 

@@ -14,32 +14,66 @@
 
 //==============================================================================
 StereoSourceSeparationAudioProcessorEditor::StereoSourceSeparationAudioProcessorEditor (StereoSourceSeparationAudioProcessor* ownerFilter)
-    : AudioProcessorEditor (ownerFilter),
-      directionComponent()
+    : AudioProcessorEditor (ownerFilter)
 {
-    addAndMakeVisible(directionComponent = new DirectionComponent());
+    width_ = 600;
+    height_ = 300;
+    dirAngle = M_PI/2;
+    widAngle = M_PI/8;
+    radius = width_/2-5;
+    arrowLine = Line<float>(width_/2+100, height_+100, 100+width_/2+radius*cos(dirAngle), 100+height_-radius*sin(dirAngle));
+    
     setSize (900, 600);
 }
 
 StereoSourceSeparationAudioProcessorEditor::~StereoSourceSeparationAudioProcessorEditor()
 {
-    directionComponent = nullptr;
 }
 
 //==============================================================================
 void StereoSourceSeparationAudioProcessorEditor::paint (Graphics& g)
 {
-    g.fillAll (Colours::darkgrey);
+    g.fillAll(Colours::darkgrey);
+    g.setColour (Colours::grey);
+    g.fillPath (internalPath);
+    g.strokePath (internalPath, PathStrokeType (1.200f));
+    g.setColour(Colours::darkgrey);
+    g.fillPath (arrowPath);
+    g.strokePath (arrowPath, PathStrokeType (1.200f));
+    g.setColour (Colours::wheat);
+    g.drawEllipse(100+5, 100+5, width_-10, 2*height_-10, 8);
+    g.setColour(Colours::darkgrey);
+    g.fillRect(0, 100+height_, getWidth(), getHeight()-height_-100);
 }
 
 void StereoSourceSeparationAudioProcessorEditor::resized()
 {
-    directionComponent->setBounds(0, 0, getWidth(), (int)(getHeight()*4/5));
+    internalPath.clear();
+    internalPath.startNewSubPath (width_/2+100, height_+100);
+    internalPath.lineTo (width_/2+100+radius*cos(dirAngle-widAngle), height_+100-radius*sin(dirAngle-widAngle));
+    internalPath.quadraticTo(width_/2+100+radius*cos(dirAngle), height_+100-radius*sin(dirAngle)-20*abs(dirAngle-M_PI/2)-20, width_/2+100+radius*cos(dirAngle+widAngle), height_+100-radius*sin(dirAngle+widAngle));
+    internalPath.lineTo (width_/2+100, height_+100);
+    internalPath.closeSubPath();
+    arrowPath.clear();
+    arrowPath.startNewSubPath (width_/2+100, height_+100);
+    arrowPath.addArrow(arrowLine, 5, 10, 10);
+    arrowPath.closeSubPath();
+
 }
 
-void StereoSourceSeparationAudioProcessorEditor::timerCallback()
+void StereoSourceSeparationAudioProcessorEditor::mouseDown (const juce::MouseEvent &e)
 {
-    
+
+}
+
+void StereoSourceSeparationAudioProcessorEditor::mouseDrag (const juce::MouseEvent &e)
+{
+    dirAngle = atanf((height_+100-e.getPosition().y)*1.0/(e.getPosition().x-width_/2-100));
+    if (dirAngle<0)
+        dirAngle += M_PI;
+    arrowLine.setEnd(100+width_/2+radius*cos(dirAngle), 100+height_-radius*sin(dirAngle));
+    resized();
+    repaint();
 }
 
 void StereoSourceSeparationAudioProcessorEditor::sliderValueChanged (Slider* slider)
