@@ -8,7 +8,7 @@
 
 #include "ADRess.h"
 
-#define SCALE_DOWN_FACTOR 1
+#define SCALE_DOWN_FACTOR 2
 
 ADRess::ADRess(int blockSize, int beta):BLOCK_SIZE(blockSize),BETA(beta)
 {
@@ -180,6 +180,14 @@ void ADRess::process(float *leftData, float *rightData)
             rightData[i] = rightData[i]*windowBuffer_[i]/BLOCK_SIZE/SCALE_DOWN_FACTOR;
         }
         
+    }
+    
+    // when by-pass, compensate for the gain coming from 1/4 hopsize
+    else {
+        for (int i = 0; i<BLOCK_SIZE; i++) {
+            leftData[i] /= SCALE_DOWN_FACTOR;
+            rightData[i] /= SCALE_DOWN_FACTOR;
+        }
     }
 }
 
