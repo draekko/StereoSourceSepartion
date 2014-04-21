@@ -22,22 +22,49 @@ StereoSourceSeparationAudioProcessorEditor::StereoSourceSeparationAudioProcessor
     widAngle = M_PI/8;
     radius = width_/2-5;
     arrowLine = Line<float>(width_/2+100, height_+100, 100+width_/2+radius*cos(dirAngle), 100+height_-radius*sin(dirAngle));
+    paintColour = Colours::lightblue;
+    
+    addAndMakeVisible(widthSlider = new Slider());
+    widthSlider->setTextBoxStyle(Slider::NoTextBox, true, 220, 30);
+    widthSlider->setColour(Slider::thumbColourId, Colours::wheat);
+    widthSlider->setColour(Slider::trackColourId, Colours::wheat);
+    widthSlider->setRange(0, 100);
+    widthSlider->addListener(this);
+    
+    addAndMakeVisible (soloToggle = new ToggleButton ("Solo"));
+    soloToggle->setColour(TextButton::buttonColourId, Colours::lightblue);
+    soloToggle->setColour(ToggleButton::textColourId, Colours::lightblue);
+    soloToggle->addListener (this);
+    
+    addAndMakeVisible (muteToggle = new ToggleButton ("Mute"));
+    muteToggle->setColour(TextButton::buttonColourId, Colours::pink);
+    muteToggle->setColour(ToggleButton::textColourId, Colours::pink);
+    muteToggle->addListener (this);
+    
+    addAndMakeVisible (bypassToggle = new ToggleButton ("Bypass"));
+    bypassToggle->setColour(TextButton::buttonColourId, Colours::lightgrey);
+    bypassToggle->setColour(ToggleButton::textColourId, Colours::lightgrey);
+    bypassToggle->addListener (this);
     
     setSize (900, 600);
 }
 
 StereoSourceSeparationAudioProcessorEditor::~StereoSourceSeparationAudioProcessorEditor()
 {
+    widthSlider = nullptr;
+    soloToggle = nullptr;
+    muteToggle = nullptr;
+    bypassToggle = nullptr;
 }
 
 //==============================================================================
 void StereoSourceSeparationAudioProcessorEditor::paint (Graphics& g)
 {
     g.fillAll(Colours::darkgrey);
-    g.setColour (Colours::grey);
+    g.setColour (paintColour);
     g.fillPath (internalPath);
     g.strokePath (internalPath, PathStrokeType (1.200f));
-    g.setColour(Colours::darkgrey);
+    g.setColour(Colour (0xff3b3b3b));
     g.fillPath (arrowPath);
     g.strokePath (arrowPath, PathStrokeType (1.200f));
     g.setColour (Colours::wheat);
@@ -50,21 +77,20 @@ void StereoSourceSeparationAudioProcessorEditor::resized()
 {
     internalPath.clear();
     internalPath.startNewSubPath (width_/2+100, height_+100);
-    internalPath.lineTo (width_/2+100+radius*cos(dirAngle-widAngle), height_+100-radius*sin(dirAngle-widAngle));
-    internalPath.quadraticTo(width_/2+100+radius*cos(dirAngle), height_+100-radius*sin(dirAngle)-20*abs(dirAngle-M_PI/2)-20, width_/2+100+radius*cos(dirAngle+widAngle), height_+100-radius*sin(dirAngle+widAngle));
-    internalPath.lineTo (width_/2+100, height_+100);
+    internalPath.addCentredArc(width_/2+100, height_+100, radius, radius, 0, (M_PI/2-dirAngle-widAngle+2*M_PI), (M_PI/2-dirAngle+widAngle+M_PI*2), false);
     internalPath.closeSubPath();
     arrowPath.clear();
     arrowPath.startNewSubPath (width_/2+100, height_+100);
-    arrowPath.addArrow(arrowLine, 5, 10, 10);
+    arrowPath.addArrow(arrowLine, 5, 20, 20);
     arrowPath.closeSubPath();
+    
+    widthSlider->setBounds( 200, 450, 400, 40);
+    soloToggle->setBounds(750, 200, 100, 50);
+    muteToggle->setBounds(750, 300, 100, 50);
+    bypassToggle->setBounds(750, 400, 100, 50);
 
 }
 
-void StereoSourceSeparationAudioProcessorEditor::mouseDown (const juce::MouseEvent &e)
-{
-
-}
 
 void StereoSourceSeparationAudioProcessorEditor::mouseDrag (const juce::MouseEvent &e)
 {
@@ -78,10 +104,30 @@ void StereoSourceSeparationAudioProcessorEditor::mouseDrag (const juce::MouseEve
 
 void StereoSourceSeparationAudioProcessorEditor::sliderValueChanged (Slider* slider)
 {
-
+    widAngle = slider->getValue()/100*M_PI;
+    resized();
+    repaint();
 }
 
 void StereoSourceSeparationAudioProcessorEditor::buttonClicked (Button* buttonThatWasClicked)
 {
-
+    if (buttonThatWasClicked == soloToggle && soloToggle->getToggleState())
+    {
+        muteToggle->setToggleState(false, juce::sendNotification);
+        bypassToggle->setToggleState(false, juce::sendNotification);
+        paintColour = Colours::lightblue;
+    }
+    else if (buttonThatWasClicked == muteToggle && muteToggle->getToggleState())
+    {
+        soloToggle->setToggleState(false, juce::sendNotification);
+        bypassToggle->setToggleState(false, juce::sendNotification);
+        paintColour = Colour (0xfff08080);
+    }
+    else if (buttonThatWasClicked == bypassToggle && bypassToggle->getToggleState())
+    {
+        soloToggle->setToggleState(false, juce::sendNotification);
+        muteToggle->setToggleState(false, juce::sendNotification);
+        paintColour = Colours::grey;
+    }
+    repaint();
 }

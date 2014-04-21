@@ -31,7 +31,6 @@ public:
     // This is just a standard Juce paint method...
     void paint (Graphics&) override;
     void resized() override;
-    void mouseDown (const juce::MouseEvent &e);
     void mouseDrag(const juce::MouseEvent &e);
     void sliderValueChanged (Slider*) override;
     void buttonClicked (Button* buttonThatWasClicked);
@@ -42,12 +41,16 @@ private:
     float dirAngle;
     float widAngle;
     float radius;
-    
+    Colour paintColour;
     
     Path internalPath;
     Path arrowPath;
     Line<float> arrowLine;
     ScopedPointer<Label> label;
+    ScopedPointer<Slider> widthSlider;
+    ScopedPointer<ToggleButton> soloToggle;
+    ScopedPointer<ToggleButton> muteToggle;
+    ScopedPointer<ToggleButton> bypassToggle;
 
 };
 
