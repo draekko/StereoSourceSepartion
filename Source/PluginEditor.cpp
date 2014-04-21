@@ -29,6 +29,7 @@ StereoSourceSeparationAudioProcessorEditor::StereoSourceSeparationAudioProcessor
     widthSlider->setColour(Slider::thumbColourId, Colours::wheat);
     widthSlider->setColour(Slider::trackColourId, Colours::wheat);
     widthSlider->setRange(0, 100);
+    widthSlider->setValue(12.5);
     widthSlider->addListener(this);
     
     addAndMakeVisible (soloToggle = new ToggleButton ("Solo"));
@@ -46,6 +47,46 @@ StereoSourceSeparationAudioProcessorEditor::StereoSourceSeparationAudioProcessor
     bypassToggle->setColour(ToggleButton::textColourId, Colours::lightgrey);
     bypassToggle->addListener (this);
     
+    addAndMakeVisible (dirLabel = new Label (String::empty,"Direction : "));
+    dirLabel->setFont (Font (20.00f, Font::bold));
+    dirLabel->setJustificationType (Justification::centred);
+    dirLabel->setEditable (false, false, false);
+    dirLabel->setColour (Label::textColourId, Colours::wheat);
+    dirLabel->setColour (TextEditor::textColourId, Colours::wheat);
+    dirLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    
+    addAndMakeVisible (widLabel = new Label (String::empty,"Width : +/-"));
+    widLabel->setFont (Font (20.00f, Font::bold));
+    widLabel->setJustificationType (Justification::centred);
+    widLabel->setEditable (false, false, false);
+    widLabel->setColour (Label::textColourId, Colours::wheat);
+    widLabel->setColour (TextEditor::textColourId, Colours::wheat);
+    widLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    
+    addAndMakeVisible (dirVal = new Label (String::empty, "0"));
+    dirVal->setFont (Font (20.00f, Font::bold));
+    dirVal->setJustificationType (Justification::centred);
+    dirVal->setEditable (false, false, false);
+    dirVal->setColour (Label::textColourId, Colours::wheat);
+    dirVal->setColour (TextEditor::textColourId, Colours::wheat);
+    dirVal->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    
+    addAndMakeVisible (widVal = new Label (String::empty, "22.5"));
+    widVal->setFont (Font (20.00f, Font::bold));
+    widVal->setJustificationType (Justification::centred);
+    widVal->setEditable (false, false, false);
+    widVal->setColour (Label::textColourId, Colours::wheat);
+    widVal->setColour (TextEditor::textColourId, Colours::wheat);
+    widVal->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    
+    addAndMakeVisible (sideVal = new Label (String::empty, "M"));
+    sideVal->setFont (Font (20.00f, Font::bold));
+    sideVal->setJustificationType (Justification::centred);
+    sideVal->setEditable (false, false, false);
+    sideVal->setColour (Label::textColourId, Colours::wheat);
+    sideVal->setColour (TextEditor::textColourId, Colours::wheat);
+    sideVal->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    
     setSize (900, 600);
 }
 
@@ -55,6 +96,11 @@ StereoSourceSeparationAudioProcessorEditor::~StereoSourceSeparationAudioProcesso
     soloToggle = nullptr;
     muteToggle = nullptr;
     bypassToggle = nullptr;
+    dirLabel = nullptr;
+    widLabel = nullptr;
+    dirVal = nullptr;
+    widVal = nullptr;
+    sideVal = nullptr;
 }
 
 //==============================================================================
@@ -88,7 +134,11 @@ void StereoSourceSeparationAudioProcessorEditor::resized()
     soloToggle->setBounds(750, 200, 100, 50);
     muteToggle->setBounds(750, 300, 100, 50);
     bypassToggle->setBounds(750, 400, 100, 50);
-
+    dirLabel->setBounds(200, 50, 80, 25);
+    widLabel->setBounds(500, 50, 100, 25);
+    dirVal->setBounds(320, 50, 60, 25);
+    widVal->setBounds(600, 50, 60, 25);
+    sideVal->setBounds(280, 50, 40, 25);
 }
 
 
@@ -97,6 +147,13 @@ void StereoSourceSeparationAudioProcessorEditor::mouseDrag (const juce::MouseEve
     dirAngle = atanf((height_+100-e.getPosition().y)*1.0/(e.getPosition().x-width_/2-100));
     if (dirAngle<0)
         dirAngle += M_PI;
+    if (dirAngle > M_PI/2)
+        sideVal->setText("L", juce::sendNotification);
+    else if (dirAngle == M_PI/2)
+        sideVal->setText("M", juce::sendNotification);
+    else
+        sideVal->setText("R", juce::sendNotification);
+    dirVal->setText(String(fabs((dirAngle-M_PI/2)*180/M_PI)), juce::sendNotification);
     arrowLine.setEnd(100+width_/2+radius*cos(dirAngle), 100+height_-radius*sin(dirAngle));
     resized();
     repaint();
@@ -105,6 +162,7 @@ void StereoSourceSeparationAudioProcessorEditor::mouseDrag (const juce::MouseEve
 void StereoSourceSeparationAudioProcessorEditor::sliderValueChanged (Slider* slider)
 {
     widAngle = slider->getValue()/100*M_PI;
+    widVal->setText(String(widAngle*180/M_PI), juce::sendNotification);
     resized();
     repaint();
 }
