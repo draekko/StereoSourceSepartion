@@ -13,8 +13,8 @@
 ADRess::ADRess(int blockSize, int beta):BLOCK_SIZE(blockSize),BETA(beta)
 {
     currStatus_ = kBypass;
-    d_ = 0;
-    H_ = 0;
+    d_ = 50;
+    H_ = 25;
     LR_ = 0;
     
     // Hann window
