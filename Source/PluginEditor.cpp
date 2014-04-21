@@ -18,7 +18,7 @@ StereoSourceSeparationAudioProcessorEditor::StereoSourceSeparationAudioProcessor
     width_ = 600;
     height_ = 300;
     dirAngle = M_PI/2;
-    widAngle = M_PI/8;
+    widAngle = M_PI/16;
     radius = width_/2-5;
     arrowLine = Line<float>(width_/2+100, height_+100, 100+width_/2+radius*cos(dirAngle), 100+height_-radius*sin(dirAngle));
     paintColour = Colours::grey;
@@ -31,6 +31,12 @@ StereoSourceSeparationAudioProcessorEditor::StereoSourceSeparationAudioProcessor
     widthSlider->setValue(12.5);
     widthSlider->addListener(this);
     
+    addAndMakeVisible (bypassToggle = new ToggleButton ("Bypass"));
+    bypassToggle->setColour(TextButton::buttonColourId, Colours::lightgrey);
+    bypassToggle->setColour(ToggleButton::textColourId, Colours::lightgrey);
+    bypassToggle->setToggleState(true, juce::sendNotification);
+    bypassToggle->addListener (this);
+    
     addAndMakeVisible (soloToggle = new ToggleButton ("Solo"));
     soloToggle->setColour(TextButton::buttonColourId, Colours::lightblue);
     soloToggle->setColour(ToggleButton::textColourId, Colours::lightblue);
@@ -40,12 +46,6 @@ StereoSourceSeparationAudioProcessorEditor::StereoSourceSeparationAudioProcessor
     muteToggle->setColour(TextButton::buttonColourId, Colours::pink);
     muteToggle->setColour(ToggleButton::textColourId, Colours::pink);
     muteToggle->addListener (this);
-    
-    addAndMakeVisible (bypassToggle = new ToggleButton ("Bypass"));
-    bypassToggle->setColour(TextButton::buttonColourId, Colours::lightgrey);
-    bypassToggle->setColour(ToggleButton::textColourId, Colours::lightgrey);
-    bypassToggle->setToggleState(true, juce::sendNotification);
-    bypassToggle->addListener (this);
     
     addAndMakeVisible (dirLabel = new Label (String::empty,"Direction : "));
     dirLabel->setFont (Font (20.00f, Font::bold));
@@ -88,6 +88,10 @@ StereoSourceSeparationAudioProcessorEditor::StereoSourceSeparationAudioProcessor
     sideVal->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     
     setSize (900, 600);
+    
+    getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kDirection, 50);
+    getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kWidth, 25);
+    getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kStatus, ADRess::kBypass);
 }
 
 StereoSourceSeparationAudioProcessorEditor::~StereoSourceSeparationAudioProcessorEditor()
@@ -131,9 +135,9 @@ void StereoSourceSeparationAudioProcessorEditor::resized()
     arrowPath.closeSubPath();
     
     widthSlider->setBounds( 200, 450, 400, 40);
-    soloToggle->setBounds(750, 200, 100, 50);
-    muteToggle->setBounds(750, 300, 100, 50);
-    bypassToggle->setBounds(750, 400, 100, 50);
+    bypassToggle->setBounds(750, 200, 100, 50);
+    soloToggle->setBounds(750, 300, 100, 50);
+    muteToggle->setBounds(750, 400, 100, 50);
     dirLabel->setBounds(200, 50, 80, 25);
     widLabel->setBounds(500, 50, 100, 25);
     dirVal->setBounds(320, 50, 60, 25);
