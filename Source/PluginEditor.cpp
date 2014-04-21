@@ -22,7 +22,7 @@ StereoSourceSeparationAudioProcessorEditor::StereoSourceSeparationAudioProcessor
     widAngle = M_PI/8;
     radius = width_/2-5;
     arrowLine = Line<float>(width_/2+100, height_+100, 100+width_/2+radius*cos(dirAngle), 100+height_-radius*sin(dirAngle));
-    paintColour = Colours::lightblue;
+    paintColour = Colours::grey;
     
     addAndMakeVisible(widthSlider = new Slider());
     widthSlider->setTextBoxStyle(Slider::NoTextBox, true, 220, 30);
@@ -45,6 +45,7 @@ StereoSourceSeparationAudioProcessorEditor::StereoSourceSeparationAudioProcessor
     addAndMakeVisible (bypassToggle = new ToggleButton ("Bypass"));
     bypassToggle->setColour(TextButton::buttonColourId, Colours::lightgrey);
     bypassToggle->setColour(ToggleButton::textColourId, Colours::lightgrey);
+    bypassToggle->setToggleState(true, juce::sendNotification);
     bypassToggle->addListener (this);
     
     addAndMakeVisible (dirLabel = new Label (String::empty,"Direction : "));
@@ -147,6 +148,9 @@ void StereoSourceSeparationAudioProcessorEditor::mouseDrag (const juce::MouseEve
     dirAngle = atanf((height_+100-e.getPosition().y)*1.0/(e.getPosition().x-width_/2-100));
     if (dirAngle<0)
         dirAngle += M_PI;
+    
+    int dirAngle_toPass = (int)(M_PI-dirAngle)/M_PI*100;
+    
     if (dirAngle > M_PI/2)
         sideVal->setText("L", juce::sendNotification);
     else if (dirAngle == M_PI/2)
