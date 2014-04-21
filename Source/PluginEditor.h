@@ -57,6 +57,10 @@ private:
     ScopedPointer<Label> widVal;
     ScopedPointer<Label> sideVal;
 
+    StereoSourceSeparationAudioProcessor* getProcessor() const
+    {
+        return static_cast <StereoSourceSeparationAudioProcessor*> (getAudioProcessor());
+    }
 };
 
 

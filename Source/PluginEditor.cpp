@@ -8,7 +8,6 @@
   ==============================================================================
 */
 
-#include "PluginProcessor.h"
 #include "PluginEditor.h"
 
 
@@ -150,6 +149,7 @@ void StereoSourceSeparationAudioProcessorEditor::mouseDrag (const juce::MouseEve
         dirAngle += M_PI;
     
     int dirAngle_toPass = (int)(M_PI-dirAngle)/M_PI*100;
+    getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kDirection, dirAngle_toPass);
     
     if (dirAngle > M_PI/2)
         sideVal->setText("L", juce::sendNotification);
@@ -166,6 +166,8 @@ void StereoSourceSeparationAudioProcessorEditor::mouseDrag (const juce::MouseEve
 void StereoSourceSeparationAudioProcessorEditor::sliderValueChanged (Slider* slider)
 {
     widAngle = slider->getValue()/100*M_PI;
+    int widAngle_toPass = (int)slider->getValue();
+    getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kWidth, widAngle_toPass);
     widVal->setText(String(widAngle*180/M_PI), juce::sendNotification);
     resized();
     repaint();
@@ -178,18 +180,21 @@ void StereoSourceSeparationAudioProcessorEditor::buttonClicked (Button* buttonTh
         muteToggle->setToggleState(false, juce::sendNotification);
         bypassToggle->setToggleState(false, juce::sendNotification);
         paintColour = Colours::lightblue;
+        getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kStatus, ADRess::kSolo);
     }
     else if (buttonThatWasClicked == muteToggle && muteToggle->getToggleState())
     {
         soloToggle->setToggleState(false, juce::sendNotification);
         bypassToggle->setToggleState(false, juce::sendNotification);
         paintColour = Colour (0xfff08080);
+        getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kStatus, ADRess::kMute);
     }
     else if (buttonThatWasClicked == bypassToggle && bypassToggle->getToggleState())
     {
         soloToggle->setToggleState(false, juce::sendNotification);
         muteToggle->setToggleState(false, juce::sendNotification);
         paintColour = Colours::grey;
+        getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kStatus, ADRess::kBypass);
     }
     repaint();
 }
