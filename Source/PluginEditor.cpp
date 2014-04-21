@@ -154,7 +154,7 @@ void StereoSourceSeparationAudioProcessorEditor::mouseDrag (const juce::MouseEve
     if (dirAngle < 0)
         dirAngle += M_PI;
 
-    int dirAngle_toPass = (int)(M_PI-dirAngle)/M_PI*100;
+    int dirAngle_toPass = (int)((M_PI-dirAngle)/M_PI*100);
     getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kDirection, dirAngle_toPass);
     
     if (dirAngle > M_PI/2)
