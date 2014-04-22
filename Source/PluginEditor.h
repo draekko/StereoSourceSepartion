@@ -51,6 +51,7 @@ private:
     ScopedPointer<ToggleButton> soloToggle;
     ScopedPointer<ToggleButton> muteToggle;
     ScopedPointer<ToggleButton> bypassToggle;
+    ScopedPointer<TextButton> resetButton;
     ScopedPointer<Label> dirLabel;
     ScopedPointer<Label> widLabel;
     ScopedPointer<Label> dirVal;

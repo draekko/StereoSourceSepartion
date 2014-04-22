@@ -47,6 +47,10 @@ StereoSourceSeparationAudioProcessorEditor::StereoSourceSeparationAudioProcessor
     muteToggle->setColour(ToggleButton::textColourId, Colours::pink);
     muteToggle->addListener (this);
     
+    addAndMakeVisible (resetButton = new TextButton ("Reset"));
+    resetButton->setColour(TextButton::buttonColourId, Colours::lightblue);
+    resetButton->addListener (this);
+    
     addAndMakeVisible (dirLabel = new Label (String::empty,"Direction : "));
     dirLabel->setFont (Font (20.00f, Font::bold));
     dirLabel->setJustificationType (Justification::centred);
@@ -100,6 +104,7 @@ StereoSourceSeparationAudioProcessorEditor::~StereoSourceSeparationAudioProcesso
     soloToggle = nullptr;
     muteToggle = nullptr;
     bypassToggle = nullptr;
+    resetButton = nullptr;
     dirLabel = nullptr;
     widLabel = nullptr;
     dirVal = nullptr;
@@ -135,9 +140,10 @@ void StereoSourceSeparationAudioProcessorEditor::resized()
     arrowPath.closeSubPath();
     
     widthSlider->setBounds( 200, 450, 400, 40);
-    bypassToggle->setBounds(750, 200, 100, 50);
-    soloToggle->setBounds(750, 300, 100, 50);
-    muteToggle->setBounds(750, 400, 100, 50);
+    bypassToggle->setBounds(750, 160, 100, 50);
+    soloToggle->setBounds(750, 220, 100, 50);
+    muteToggle->setBounds(750, 280, 100, 50);
+    resetButton->setBounds(750, 360, 100, 30);
     dirLabel->setBounds(200, 50, 80, 25);
     widLabel->setBounds(500, 50, 100, 25);
     dirVal->setBounds(320, 50, 60, 25);
@@ -202,5 +208,18 @@ void StereoSourceSeparationAudioProcessorEditor::buttonClicked (Button* buttonTh
         paintColour = Colours::grey;
         getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kStatus, ADRess::kBypass);
     }
+    else if (buttonThatWasClicked == resetButton)
+    {
+        dirAngle = M_PI/2;
+        widAngle = M_PI/16;
+        widthSlider->setValue(12.5);
+        sideVal->setText("M", juce::sendNotification);
+        dirVal->setText(String(0), juce::sendNotification);
+        arrowLine.setEnd(100+width_/2, 100+height_-radius);
+        widVal->setText(String(widAngle*180/M_PI), juce::sendNotification);
+        getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kDirection, 50);
+        getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kWidth, (int)widthSlider->getValue());
+    }
+    resized();
     repaint();
 }
