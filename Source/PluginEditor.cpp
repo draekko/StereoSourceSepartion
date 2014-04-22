@@ -15,12 +15,12 @@
 StereoSourceSeparationAudioProcessorEditor::StereoSourceSeparationAudioProcessorEditor (StereoSourceSeparationAudioProcessor* ownerFilter)
     : AudioProcessorEditor (ownerFilter)
 {
-    width_ = 600;
-    height_ = 300;
+    width_ = 400;
+    height_ = 200;
     dirAngle = M_PI/2;
     widAngle = M_PI/16;
     radius = width_/2-5;
-    arrowLine = Line<float>(width_/2+100, height_+100, 100+width_/2+radius*cos(dirAngle), 100+height_-radius*sin(dirAngle));
+    arrowLine = Line<float>(width_/2+50, height_+100, 50+width_/2+radius*cos(dirAngle), 100+height_-radius*sin(dirAngle));
     paintColour = Colours::grey;
     
     addAndMakeVisible(widthSlider = new Slider());
@@ -47,8 +47,8 @@ StereoSourceSeparationAudioProcessorEditor::StereoSourceSeparationAudioProcessor
     muteToggle->setColour(ToggleButton::textColourId, Colours::pink);
     muteToggle->addListener (this);
     
-    addAndMakeVisible (resetButton = new TextButton ("Reset"));
-    resetButton->setColour(TextButton::buttonColourId, Colours::lightblue);
+    addAndMakeVisible (resetButton = new TextButton ("R"));
+    resetButton->setColour(TextButton::buttonColourId, Colours::lightpink);
     resetButton->addListener (this);
     
     addAndMakeVisible (dirLabel = new Label (String::empty,"Direction : "));
@@ -91,7 +91,7 @@ StereoSourceSeparationAudioProcessorEditor::StereoSourceSeparationAudioProcessor
     sideVal->setColour (TextEditor::textColourId, Colours::wheat);
     sideVal->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     
-    setSize (900, 600);
+    setSize (600, 400);
     
     getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kDirection, 50);
     getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kWidth, 25);
@@ -123,7 +123,7 @@ void StereoSourceSeparationAudioProcessorEditor::paint (Graphics& g)
     g.fillPath (arrowPath);
     g.strokePath (arrowPath, PathStrokeType (1.200f));
     g.setColour (Colours::wheat);
-    g.drawEllipse(100+5, 100+5, width_-10, 2*height_-10, 8);
+    g.drawEllipse(50+5, 100+5, width_-10, 2*height_-10, 8);
     g.setColour(Colours::darkgrey);
     g.fillRect(0, 100+height_, getWidth(), getHeight()-height_-100);
 }
@@ -131,24 +131,24 @@ void StereoSourceSeparationAudioProcessorEditor::paint (Graphics& g)
 void StereoSourceSeparationAudioProcessorEditor::resized()
 {
     internalPath.clear();
-    internalPath.startNewSubPath (width_/2+100, height_+100);
-    internalPath.addCentredArc(width_/2+100, height_+100, radius, radius, 0, (M_PI/2-dirAngle-widAngle+2*M_PI), (M_PI/2-dirAngle+widAngle+M_PI*2), false);
+    internalPath.startNewSubPath (width_/2+50, height_+100);
+    internalPath.addCentredArc(width_/2+50, height_+100, radius, radius, 0, (M_PI/2-dirAngle-widAngle+2*M_PI), (M_PI/2-dirAngle+widAngle+M_PI*2), false);
     internalPath.closeSubPath();
     arrowPath.clear();
-    arrowPath.startNewSubPath (width_/2+100, height_+100);
+    arrowPath.startNewSubPath (width_/2+50, height_+100);
     arrowPath.addArrow(arrowLine, 5, 20, 20);
     arrowPath.closeSubPath();
     
-    widthSlider->setBounds( 200, 450, 400, 40);
-    bypassToggle->setBounds(750, 160, 100, 50);
-    soloToggle->setBounds(750, 220, 100, 50);
-    muteToggle->setBounds(750, 280, 100, 50);
-    resetButton->setBounds(750, 360, 100, 30);
-    dirLabel->setBounds(200, 50, 80, 25);
-    widLabel->setBounds(500, 50, 100, 25);
-    dirVal->setBounds(320, 50, 60, 25);
-    widVal->setBounds(600, 50, 60, 25);
-    sideVal->setBounds(280, 50, 40, 25);
+    widthSlider->setBounds(150, 330, 200, 40);
+    bypassToggle->setBounds(500, 150, 80, 30);
+    soloToggle->setBounds(500, 180, 80, 30);
+    muteToggle->setBounds(500, 210, 80, 30);
+    resetButton->setBounds(515, 320, 30, 30);
+    dirLabel->setBounds(50, 50, 80, 25);
+    widLabel->setBounds(300, 50, 100, 25);
+    dirVal->setBounds(150, 50, 60, 25);
+    widVal->setBounds(400, 50, 60, 25);
+    sideVal->setBounds(130, 50, 30, 25);
 }
 
 
@@ -170,7 +170,7 @@ void StereoSourceSeparationAudioProcessorEditor::mouseDrag (const juce::MouseEve
     else
         sideVal->setText("R", juce::sendNotification);
     dirVal->setText(String(fabs((dirAngle-M_PI/2)*180/M_PI)), juce::sendNotification);
-    arrowLine.setEnd(100+width_/2+radius*cos(dirAngle), 100+height_-radius*sin(dirAngle));
+    arrowLine.setEnd(50+width_/2+radius*cos(dirAngle), 100+height_-radius*sin(dirAngle));
     resized();
     repaint();
 }
@@ -191,6 +191,9 @@ void StereoSourceSeparationAudioProcessorEditor::buttonClicked (Button* buttonTh
     {
         muteToggle->setToggleState(false, juce::sendNotification);
         bypassToggle->setToggleState(false, juce::sendNotification);
+        soloToggle->setEnabled(false);
+        muteToggle->setEnabled(true);
+        bypassToggle->setEnabled(true);
         paintColour = Colours::lightblue;
         getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kStatus, ADRess::kSolo);
     }
@@ -198,6 +201,9 @@ void StereoSourceSeparationAudioProcessorEditor::buttonClicked (Button* buttonTh
     {
         soloToggle->setToggleState(false, juce::sendNotification);
         bypassToggle->setToggleState(false, juce::sendNotification);
+        soloToggle->setEnabled(true);
+        muteToggle->setEnabled(false);
+        bypassToggle->setEnabled(true);
         paintColour = Colour (0xfff08080);
         getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kStatus, ADRess::kMute);
     }
@@ -205,6 +211,9 @@ void StereoSourceSeparationAudioProcessorEditor::buttonClicked (Button* buttonTh
     {
         soloToggle->setToggleState(false, juce::sendNotification);
         muteToggle->setToggleState(false, juce::sendNotification);
+        soloToggle->setEnabled(true);
+        muteToggle->setEnabled(true);
+        bypassToggle->setEnabled(false);
         paintColour = Colours::grey;
         getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kStatus, ADRess::kBypass);
     }
@@ -215,7 +224,7 @@ void StereoSourceSeparationAudioProcessorEditor::buttonClicked (Button* buttonTh
         widthSlider->setValue(12.5);
         sideVal->setText("M", juce::sendNotification);
         dirVal->setText(String(0), juce::sendNotification);
-        arrowLine.setEnd(100+width_/2, 100+height_-radius);
+        arrowLine.setEnd(50+width_/2, 100+height_-radius);
         widVal->setText(String(widAngle*180/M_PI), juce::sendNotification);
         getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kDirection, 50);
         getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kWidth, (int)widthSlider->getValue());
