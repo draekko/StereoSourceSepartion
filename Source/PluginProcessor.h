@@ -94,6 +94,10 @@ private:
     
     int samplesSinceLastFFT_;
     
+    ADRess::Status_t status_;
+    int direction_;
+    int width_;
+    
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StereoSourceSeparationAudioProcessor)
 };

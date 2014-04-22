@@ -26,6 +26,10 @@ StereoSourceSeparationAudioProcessor::StereoSourceSeparationAudioProcessor()
     inputBufferLength_ = FFT_SIZE;
     outputBufferLength_ = FFT_SIZE*2;
     separator_ = 0;
+    
+    status_ = ADRess::kBypass;
+    direction_ = 50;
+    width_ = 25;
 }
 
 StereoSourceSeparationAudioProcessor::~StereoSourceSeparationAudioProcessor()
@@ -45,44 +49,44 @@ int StereoSourceSeparationAudioProcessor::getNumParameters()
 
 float StereoSourceSeparationAudioProcessor::getParameter (int index)
 {
-    if (separator_) {
-        switch (index) {
-            case kStatus:
-                return (float)separator_->getStatus();
-                
-            case kDirection:
-                return (float)separator_->getDirection();
-                
-            case kWidth:
-                return (float)separator_->getWidth();
-                
-            default:
-                return 0.0f;
-        }
+    switch (index) {
+        case kStatus:
+            return (float)status_;
+            
+        case kDirection:
+            return (float)direction_;
+            
+        case kWidth:
+            return (float)width_;
+            
+        default:
+            return 0.0f;
     }
-    else
-        return 0.0f;
 }
 
 void StereoSourceSeparationAudioProcessor::setParameter (int index, float newValue)
 {
-    if (separator_) {
-        switch (index) {
-            case kStatus:
-                separator_->setStatus( static_cast<ADRess::Status_t>(newValue) );
-                break;
-                
-            case kDirection:
-                separator_->setDirection( static_cast<int>(newValue) );
-                break;
-                
-            case kWidth:
-                separator_->setWidth( static_cast<int>(newValue) );
-                break;
-                
-            default:
-                break;
-        }
+    switch (index) {
+        case kStatus:
+            status_ = static_cast<ADRess::Status_t>(newValue);
+            if (separator_)
+                separator_->setStatus( status_ );
+            break;
+            
+        case kDirection:
+            direction_ = static_cast<int>(newValue);
+            if (separator_)
+                separator_->setDirection( direction_ );
+            break;
+            
+        case kWidth:
+            width_ = static_cast<int>(newValue);
+            if (separator_)
+                separator_->setWidth( width_ );
+            break;
+            
+        default:
+            break;
     }
 }
 
@@ -192,6 +196,10 @@ void StereoSourceSeparationAudioProcessor::prepareToPlay (double sampleRate, int
     inputBufferWritePosition_ = outputBufferWritePosition_ = 0;
     outputBufferReadPosition_ = (outputBufferLength_ - HOP_SIZE - 1) % outputBufferLength_;
     samplesSinceLastFFT_ = 0;
+    
+    separator_->setStatus( status_ );
+    separator_->setDirection( direction_ );
+    separator_->setWidth( width_ );
 }
 
 void StereoSourceSeparationAudioProcessor::releaseResources()
