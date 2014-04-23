@@ -151,7 +151,11 @@ void ADRess::process(float *leftData, float *rightData)
             for (int g = 0; g<=BETA; g++)
                 azimuth_[n][g] = 0;
             
-            azimuth_[n][minIndices_[n]] = maxValues_[n] - minValues_[n];
+            if  (currStatus_ == kSolo)
+                // for better rejection of signal from other channel
+                azimuth_[n][minIndices_[n]] = maxValues_[n] - minValues_[n];
+            else
+                azimuth_[n][minIndices_[n]] = maxValues_[n];
             
             resynMag_[n] = sumUpPeaks(azimuth_[n]);
         }
