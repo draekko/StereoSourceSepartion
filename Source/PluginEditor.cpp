@@ -160,7 +160,7 @@ void StereoSourceSeparationAudioProcessorEditor::mouseDrag (const juce::MouseEve
     if (dirAngle < 0)
         dirAngle += M_PI;
 
-    int dirAngle_toPass = (int)((M_PI-dirAngle)/M_PI*100);
+    int dirAngle_toPass = (M_PI-dirAngle)/M_PI*100;
     getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kDirection, dirAngle_toPass);
     
     if (dirAngle > M_PI/2)
@@ -178,7 +178,7 @@ void StereoSourceSeparationAudioProcessorEditor::mouseDrag (const juce::MouseEve
 void StereoSourceSeparationAudioProcessorEditor::sliderValueChanged (Slider* slider)
 {
     widAngle = slider->getValue()/100*M_PI/2;
-    int widAngle_toPass = (int)slider->getValue();
+    int widAngle_toPass = slider->getValue();
     getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kWidth, widAngle_toPass);
     widVal->setText(String(widAngle*180/M_PI), juce::sendNotification);
     resized();
@@ -227,7 +227,7 @@ void StereoSourceSeparationAudioProcessorEditor::buttonClicked (Button* buttonTh
         arrowLine.setEnd(50+width_/2, 100+height_-radius);
         widVal->setText(String(widAngle*180/M_PI), juce::sendNotification);
         getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kDirection, 50);
-        getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kWidth, (int)widthSlider->getValue());
+        getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kWidth, widthSlider->getValue());
     }
     resized();
     repaint();

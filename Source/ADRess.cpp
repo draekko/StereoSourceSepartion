@@ -233,12 +233,24 @@ float ADRess::sumUpPeaks(float *nthBinAzm)
         case kSolo:
             for (int i = startInd; i<=endInd; i++)
                 sum += nthBinAzm[i];
+            
+            // add smoothing along azimuth
+            for (int i = 1; i<4 && startInd-i>=0; i++)
+                sum += nthBinAzm[startInd-i]*(4-i)/4;
+            for (int i = 1; i<4 && endInd+i<=BETA;i++)
+                sum += nthBinAzm[endInd+i]*(4-i)/4;
+            
             break;
             
         case kMute:
             for (int i = 0; i<=BETA; i++)
                 if (i<startInd || i>endInd)
                     sum += nthBinAzm[i];
+            
+            // smoothing along azimuth
+            for (int i = 0; i<4; i++)
+                if (startInd+i<endInd-i)
+                    sum += nthBinAzm[startInd-i]*(4-i)/4 + nthBinAzm[endInd+i]*(4-i)/4;
             break;
             
         case kBypass:
