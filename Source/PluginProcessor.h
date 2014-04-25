@@ -29,6 +29,8 @@ public:
         kStatus,
         kDirection,
         kWidth,
+        kFilterType,
+        kCutOffFrequency,
         kNumParameters
     };
     
@@ -97,6 +99,8 @@ private:
     ADRess::Status_t status_;
     int direction_;
     int width_;
+    ADRess::FilterType_t filterType_;
+    float cutOffFrequency_;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StereoSourceSeparationAudioProcessor)

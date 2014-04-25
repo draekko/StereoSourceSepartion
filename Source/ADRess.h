@@ -19,7 +19,7 @@ using std::complex;
 class ADRess
 {
 public:
-    ADRess (int blockSize, int beta);
+    ADRess (double sampleRate, int blockSize, int beta);
     ~ADRess ();
     
     enum Status_t
@@ -29,23 +29,42 @@ public:
         kMute
     };
     
+    enum FilterType_t
+    {
+        kAllPass,
+        kLowPass,
+        kHighPass
+    };
+    
     void setStatus(Status_t newStatus);
-    void setDirection(int newDirection);
+    void setDirection(int newDirection);  // this function is a little different from other set functions
     void setWidth(int newWidth);
+    void setFilterType(FilterType_t newFilterType);
+    void setCutOffFrequency(float newCutOffFrequency);
     
     const Status_t getStatus();
     const int getDirection();
     const int getWidth();
+    const FilterType_t getFilterType();
+    const int getCutOffFrequency();
     
     void process (float* leftData, float* rightData);
     
 private:
+    const double sampleRate_;
     const int BLOCK_SIZE;
     const int BETA;
+    
     Status_t currStatus_;
     int d_;
     int H_;
+    FilterType_t currFilter_;
+    float cutOffFrequency_;
+    int cutOffBinIndex_;
+    
     float* windowBuffer_;
+    float* frequencyMask_;
+    
     int LR_;   // 0 for left, 1 for right, 2 for centre
     
     kiss_fftr_cfg fwd_;
@@ -75,7 +94,9 @@ private:
     
     void getMinimum(int nthBin, float* nthBinAzm, float* minValues, int* minIndices);
     void getMaximum(int nthBin, float* nthBinAzm, float* maxValues);
-    float sumUpPeaks(float* nthBinAzm);
+    float sumUpPeaks(int nthBin, float* nthBinAzm);
+    
+    void updateFrequencyMask();
 };
 
 #endif /* defined(__StereoSourceSeparation__ADRess__) */

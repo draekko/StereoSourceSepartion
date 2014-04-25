@@ -28,8 +28,11 @@ StereoSourceSeparationAudioProcessor::StereoSourceSeparationAudioProcessor()
     separator_ = 0;
     
     status_ = ADRess::kBypass;
-    direction_ = 50;
-    width_ = 25;
+    direction_ = BETA/2;
+    width_ = BETA/4;
+    filterType_ = ADRess::kAllPass;
+    cutOffFrequency_ = 0.0;
+    
 }
 
 StereoSourceSeparationAudioProcessor::~StereoSourceSeparationAudioProcessor()
@@ -59,6 +62,12 @@ float StereoSourceSeparationAudioProcessor::getParameter (int index)
         case kWidth:
             return (float)width_;
             
+        case kFilterType:
+            return (float)filterType_;
+            
+        case kCutOffFrequency:
+            return cutOffFrequency_;
+            
         default:
             return 0.0f;
     }
@@ -85,6 +94,20 @@ void StereoSourceSeparationAudioProcessor::setParameter (int index, float newVal
                 separator_->setWidth( width_ );
             break;
             
+        case kFilterType:
+            filterType_ = static_cast<ADRess::FilterType_t>(newValue);
+            if (separator_)
+                separator_->setFilterType(filterType_);
+                
+            break;
+            
+        case kCutOffFrequency:
+            cutOffFrequency_ = newValue;
+            if (separator_)
+                separator_->setCutOffFrequency(cutOffFrequency_);
+            
+            break;
+            
         default:
             break;
     }
@@ -101,6 +124,12 @@ const String StereoSourceSeparationAudioProcessor::getParameterName (int index)
             
         case kWidth:
             return "Width";
+            
+        case kFilterType:
+            return "FilterType";
+            
+        case kCutOffFrequency:
+            return "CutOffFrequency";
             
         default:
             return String::empty;
@@ -188,7 +217,7 @@ void StereoSourceSeparationAudioProcessor::prepareToPlay (double sampleRate, int
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    separator_ = new ADRess(BLOCK_SIZE, BETA);
+    separator_ = new ADRess(sampleRate, BLOCK_SIZE, BETA);
     
     inputBuffer_.clear();
     outputBuffer_.clear();
@@ -200,6 +229,8 @@ void StereoSourceSeparationAudioProcessor::prepareToPlay (double sampleRate, int
     separator_->setStatus( status_ );
     separator_->setDirection( direction_ );
     separator_->setWidth( width_ );
+    separator_->setFilterType(filterType_);
+    separator_->setCutOffFrequency(cutOffFrequency_);
 }
 
 void StereoSourceSeparationAudioProcessor::releaseResources()

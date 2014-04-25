@@ -10,18 +10,25 @@
 
 #define SCALE_DOWN_FACTOR 2
 
-ADRess::ADRess(int blockSize, int beta):BLOCK_SIZE(blockSize),BETA(beta)
+ADRess::ADRess(double sampleRate, int blockSize, int beta):sampleRate_(sampleRate),BLOCK_SIZE(blockSize),BETA(beta)
 {
     currStatus_ = kBypass;
-    d_ = 50;
-    H_ = 25;
+    d_ = BETA/2;
+    H_ = BETA/4;
     LR_ = 2;
+    currFilter_ = kAllPass;
+    cutOffFrequency_ = 0.0;
+    cutOffBinIndex_ = 0;
     
     // Hann window
     windowBuffer_ = new float[BLOCK_SIZE];
-    for (int i = 0; i < BLOCK_SIZE; i++) {
+    for (int i = 0; i < BLOCK_SIZE; i++)
         windowBuffer_[i] = 0.5*(1.0 - cos(2.0*M_PI*(float)i/(BLOCK_SIZE-1)) );
-    }
+    
+    // all pass frequency mask
+    frequencyMask_ = new float[BLOCK_SIZE/2+1];
+    for (int i = 0; i < BLOCK_SIZE/2+1; i++)
+        frequencyMask_[i] = 1.0;
     
     // initialise FFt
     fwd_= kiss_fftr_alloc(BLOCK_SIZE,0,NULL,NULL);
@@ -78,6 +85,11 @@ ADRess::~ADRess()
     if (windowBuffer_) {
         delete [] windowBuffer_;
         windowBuffer_ = 0;
+    }
+    
+    if (frequencyMask_) {
+        delete [] frequencyMask_;
+        frequencyMask_ = 0;
     }
     
     if (leftSpectrum_) {
@@ -166,7 +178,7 @@ void ADRess::setStatus(Status_t newStatus)
 }
 
 
-
+// left most to right most from 0 to BETA
 void ADRess::setDirection(int newDirection)
 {
     if (newDirection == BETA/2) {
@@ -189,6 +201,23 @@ void ADRess::setDirection(int newDirection)
 void ADRess::setWidth(int newWidth)
 {
     H_ = newWidth;
+}
+
+
+
+void ADRess::setFilterType(FilterType_t newFilterType)
+{
+    currFilter_ = newFilterType;
+    updateFrequencyMask();
+}
+
+
+
+void ADRess::setCutOffFrequency(float newCutOffFrequency)
+{
+    cutOffFrequency_ = newCutOffFrequency;
+    cutOffBinIndex_ = static_cast<int>(cutOffFrequency_/sampleRate_);
+    updateFrequencyMask();
 }
 
 
@@ -216,6 +245,19 @@ const int ADRess::getWidth()
     return H_;
 }
 
+
+
+const ADRess::FilterType_t ADRess::getFilterType()
+{
+    return currFilter_;
+}
+
+
+
+const int ADRess::getCutOffFrequency()
+{
+    return cutOffFrequency_;
+}
 
 
 
@@ -261,8 +303,16 @@ void ADRess::process(float *leftData, float *rightData)
                 else
                     azimuthR_[n][minIndicesR_[n]] = maxValuesR_[n];
                 
-                resynMagR_[n] = sumUpPeaks(azimuthR_[n]);
+                resynMagR_[n] = sumUpPeaks(n, azimuthR_[n]);
             }
+            
+            // resynth and output
+            for (int i = 0; i<BLOCK_SIZE/2+1; i++)
+                rightSpectrum_[i] = std::polar(resynMagR_[i], rightPhase_[i]);
+            
+            kiss_fftri(inv_, (kiss_fft_cpx*)rightSpectrum_, (kiss_fft_scalar*)rightData);
+            memcpy(leftData, rightData, BLOCK_SIZE*sizeof(float));
+            
             
         } else if (LR_ == 0) {   // when left channel dominates
             for (int n = 0; n<BLOCK_SIZE/2+1; n++)
@@ -282,8 +332,15 @@ void ADRess::process(float *leftData, float *rightData)
                 else
                     azimuthL_[n][minIndicesL_[n]] = maxValuesL_[n];
                 
-                resynMagL_[n] = sumUpPeaks(azimuthL_[n]);
+                resynMagL_[n] = sumUpPeaks(n, azimuthL_[n]);
             }
+            
+            // resynth and output
+            for (int i = 0; i<BLOCK_SIZE/2+1; i++)
+                leftSpectrum_[i] = std::polar(resynMagL_[i], leftPhase_[i]);
+            
+            kiss_fftri(inv_, (kiss_fft_cpx*)leftSpectrum_, (kiss_fft_scalar*)leftData);
+            memcpy(rightData, leftData, BLOCK_SIZE*sizeof(float));
             
         } else {
             // azimuthR_ for right channel
@@ -308,7 +365,7 @@ void ADRess::process(float *leftData, float *rightData)
                 else
                     azimuthR_[n][minIndicesR_[n]] = maxValuesR_[n];
                 
-                resynMagR_[n] = sumUpPeaks(azimuthR_[n]);
+                resynMagR_[n] = sumUpPeaks(n, azimuthR_[n]);
             }
             
             for (int n = 0; n<BLOCK_SIZE/2+1; n++) {
@@ -324,27 +381,11 @@ void ADRess::process(float *leftData, float *rightData)
                 else
                     azimuthL_[n][minIndicesL_[n]] = maxValuesL_[n];
                 
-                resynMagL_[n] = sumUpPeaks(azimuthL_[n]);
+                resynMagL_[n] = sumUpPeaks(n, azimuthL_[n]);
             }
             
-        }
-        
-        
-        if (LR_ == 1) {
-            for (int i = 0; i<BLOCK_SIZE/2+1; i++)
-                rightSpectrum_[i] = std::polar(resynMagR_[i], rightPhase_[i]);
             
-            kiss_fftri(inv_, (kiss_fft_cpx*)rightSpectrum_, (kiss_fft_scalar*)rightData);
-            memcpy(leftData, rightData, BLOCK_SIZE*sizeof(float));
-            
-        } else if (LR_ == 0){
-            for (int i = 0; i<BLOCK_SIZE/2+1; i++)
-                leftSpectrum_[i] = std::polar(resynMagL_[i], leftPhase_[i]);
-            
-            kiss_fftri(inv_, (kiss_fft_cpx*)leftSpectrum_, (kiss_fft_scalar*)leftData);
-            memcpy(rightData, leftData, BLOCK_SIZE*sizeof(float));
-        } else {
-            
+            // resynth and output
             for (int i = 0; i<BLOCK_SIZE/2+1; i++)
                 rightSpectrum_[i] = std::polar(resynMagR_[i], rightPhase_[i]);
             kiss_fftri(inv_, (kiss_fft_cpx*)rightSpectrum_, (kiss_fft_scalar*)rightData);
@@ -353,8 +394,8 @@ void ADRess::process(float *leftData, float *rightData)
                 leftSpectrum_[i] = std::polar(resynMagL_[i], leftPhase_[i]);
             
             kiss_fftri(inv_, (kiss_fft_cpx*)leftSpectrum_, (kiss_fft_scalar*)leftData);
+            
         }
-        
         
         // scale down ifft results and windowing
         for (int i = 0; i<BLOCK_SIZE; i++) {
@@ -409,41 +450,89 @@ void ADRess::getMaximum(int nthBin, float* nthBinAzm, float* maxValues)
 
 
 
-float ADRess::sumUpPeaks(float *nthBinAzm)
+float ADRess::sumUpPeaks(int nthBIn, float *nthBinAzm)
 {
-    float sum = 0;
+    if (frequencyMask_[nthBIn] == 0.0) {
+        return 0.0;
+    } else {
+        
+        float sum = 0.0;
+        
+        int startInd = std::max(0, d_-H_/2);
+        int endInd = std::min(BETA, d_+H_/2);
+        
+        switch (currStatus_) {
+            case kSolo:
+                for (int i = startInd; i<=endInd; i++)
+                    sum += nthBinAzm[i];
+                
+                // add smoothing along azimuth
+                for (int i = 1; i<4 && startInd-i>=0; i++)
+                    sum += nthBinAzm[startInd-i]*(4-i)/4;
+                for (int i = 1; i<4 && endInd+i<=BETA;i++)
+                    sum += nthBinAzm[endInd+i]*(4-i)/4;
+                
+                sum *= frequencyMask_[nthBIn];
+                break;
+                
+            case kMute:
+                if (currFilter_) {
+                    for (int i = startInd; i<=endInd; i++)
+                        sum += nthBinAzm[i];
+                    sum *= frequencyMask_[nthBIn];
+                }
+                
+                for (int i = 0; i<=BETA; i++)
+                    if (i<startInd || i>endInd)
+                        sum += nthBinAzm[i];
+                
+            case kBypass:
+            default:
+                break;
+                
+        }
+        return sum;
+    }
     
-    int startInd = std::max(0, d_-H_/2);
-    int endInd = std::min(BETA, d_+H_/2);
-    
-    switch (currStatus_) {
-        case kSolo:
-            for (int i = startInd; i<=endInd; i++)
-                sum += nthBinAzm[i];
+}
+
+
+void ADRess::updateFrequencyMask()
+{
+    switch (currFilter_) {
+        case kAllPass:
+            for (int i = 0; i<BETA/2+1; i++ )
+                frequencyMask_[i] = 1.0;
+            break;
             
-            // add smoothing along azimuth
-            for (int i = 1; i<4 && startInd-i>=0; i++)
-                sum += nthBinAzm[startInd-i]*(4-i)/4;
-            for (int i = 1; i<4 && endInd+i<=BETA;i++)
-                sum += nthBinAzm[endInd+i]*(4-i)/4;
+        case kLowPass:
+            for (int i = 0; i<cutOffBinIndex_; i++)
+                frequencyMask_[i] = 1.0;
+            for (int i = cutOffBinIndex_; i<BETA/2+1; i++)
+                frequencyMask_[i] = 0.0;
+            
+            frequencyMask_[cutOffBinIndex_] = 0.5;
+            if (cutOffBinIndex_-1 >= 0)
+                frequencyMask_[cutOffBinIndex_-1] = 0.75;
+            if (cutOffBinIndex_+1 <= BETA/2)
+                frequencyMask_[cutOffBinIndex_+1] = 0.25;
             
             break;
             
-        case kMute:
-            for (int i = 0; i<=BETA; i++)
-                if (i<startInd || i>endInd)
-                    sum += nthBinAzm[i];
+        case kHighPass:
+            for (int i = 0; i<cutOffBinIndex_; i++)
+                frequencyMask_[i] = 0.0;
+            for (int i = cutOffBinIndex_; i<BETA/2+1; i++)
+                frequencyMask_[i] = 1.0;
+            break;
             
-            // smoothing along azimuth
-//            for (int i = 0; i<4; i++)
-//                if (startInd+i<endInd-i)
-//                    sum += nthBinAzm[startInd+i]*(4-i)/4 + nthBinAzm[endInd-i]*(4-i)/4;
-//            break;
+            frequencyMask_[cutOffBinIndex_] = 0.5;
+            if (cutOffBinIndex_-1 >= 0)
+                frequencyMask_[cutOffBinIndex_-1] = 0.25;
+            if (cutOffBinIndex_+1 <= BETA/2)
+                frequencyMask_[cutOffBinIndex_+1] = 0.75;
             
-        case kBypass:
         default:
             break;
     }
-    
-    return sum;
 }
