@@ -45,9 +45,8 @@ private:
     Status_t currStatus_;
     int d_;
     int H_;
-    float* resynMag_;
     float* windowBuffer_;
-    int LR_;   // 0 for left, 1 for right
+    int LR_;   // 0 for left, 1 for right, 2 for centre
     
     kiss_fftr_cfg fwd_;
     kiss_fftr_cfg inv_;
@@ -60,14 +59,22 @@ private:
     float* leftPhase_;
     float* rightPhase_;
     
-    int*  minIndices_;
-    float* minValues_;
-    float* maxValues_;
+    int*  minIndicesL_;
+    float* minValuesL_;
+    float* maxValuesL_;
     
-    float** azimuth_;
+    int*  minIndicesR_;
+    float* minValuesR_;
+    float* maxValuesR_;
     
-    void getMinimum(int nthBin, float* nthBinAzm);
-    void getMaximum(int nthBin, float* nthBinAzm);
+    float** azimuthL_;
+    float** azimuthR_;
+    
+    float* resynMagL_;
+    float* resynMagR_;
+    
+    void getMinimum(int nthBin, float* nthBinAzm, float* minValues, int* minIndices);
+    void getMaximum(int nthBin, float* nthBinAzm, float* maxValues);
     float sumUpPeaks(float* nthBinAzm);
 };
 

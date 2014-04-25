@@ -15,7 +15,7 @@ ADRess::ADRess(int blockSize, int beta):BLOCK_SIZE(blockSize),BETA(beta)
     currStatus_ = kBypass;
     d_ = 50;
     H_ = 25;
-    LR_ = 0;
+    LR_ = 2;
     
     // Hann window
     windowBuffer_ = new float[BLOCK_SIZE];
@@ -35,45 +35,145 @@ ADRess::ADRess(int blockSize, int beta):BLOCK_SIZE(blockSize),BETA(beta)
     leftPhase_ = new float[BLOCK_SIZE/2+1];
     rightPhase_ = new float[BLOCK_SIZE/2+1];
     
-    resynMag_ = new float[BLOCK_SIZE/2+1];
+    resynMagL_ = new float[BLOCK_SIZE/2+1];
+    for (int i = 0; i<=BLOCK_SIZE/2; i++)
+        resynMagL_[i] = 0;
     
-    minIndices_ = new int[BLOCK_SIZE/2+1];
-    minValues_ = new float[BLOCK_SIZE/2+1];
-    maxValues_ = new float[BLOCK_SIZE/2+1];
+    resynMagR_ = new float[BLOCK_SIZE/2+1];
+    for (int i = 0; i<=BLOCK_SIZE/2; i++)
+        resynMagR_[i] = 0;
     
-    azimuth_ = new float*[BLOCK_SIZE/2+1];
+    minIndicesL_ = new int[BLOCK_SIZE/2+1];
+    minValuesL_ = new float[BLOCK_SIZE/2+1];
+    maxValuesL_ = new float[BLOCK_SIZE/2+1];
+    
+    minIndicesR_ = new int[BLOCK_SIZE/2+1];
+    minValuesR_ = new float[BLOCK_SIZE/2+1];
+    maxValuesR_ = new float[BLOCK_SIZE/2+1];
+    
+    azimuthL_ = new float*[BLOCK_SIZE/2+1];
     for (int n = 0; n<BLOCK_SIZE/2+1; n++)
-        azimuth_[n] = new float[BETA+1];
+        azimuthL_[n] = new float[BETA+1];
+    
+    azimuthR_ = new float*[BLOCK_SIZE/2+1];
+    for (int n = 0; n<BLOCK_SIZE/2+1; n++)
+        azimuthR_[n] = new float[BETA+1];
     
 }
 
+
+
 ADRess::~ADRess()
 {
-    delete [] resynMag_;
-    delete [] windowBuffer_;
-    delete [] leftSpectrum_;
-    delete [] rightSpectrum_;
-    delete [] leftMag_;
-    delete [] rightMag_;
-    delete [] leftPhase_;
-    delete [] rightPhase_;
-    delete [] minIndices_;
-    delete [] minValues_;
-    delete [] maxValues_;
+    if (resynMagL_) {
+        delete [] resynMagL_;
+        resynMagL_ = 0;
+    }
     
-    for (int n = 0; n<BLOCK_SIZE/2+1; n++)
-        delete [] azimuth_[n];
-    delete [] azimuth_;
+    if (resynMagR_) {
+        delete [] resynMagR_;
+        resynMagR_ = 0;
+    }
+    
+    if (windowBuffer_) {
+        delete [] windowBuffer_;
+        windowBuffer_ = 0;
+    }
+    
+    if (leftSpectrum_) {
+        delete [] leftSpectrum_;
+        leftSpectrum_ = 0;
+    }
+    
+    if (rightSpectrum_) {
+        delete [] rightSpectrum_;
+        rightSpectrum_ = 0;
+    }
+    
+    if (leftMag_) {
+        delete [] leftMag_;
+        leftMag_ = 0;
+    }
+    
+    if (rightMag_) {
+        delete [] rightMag_;
+        rightMag_ = 0;
+    }
+    
+    if (leftPhase_) {
+        delete [] leftPhase_;
+        leftPhase_ = 0;
+    }
+    
+    if (rightPhase_) {
+        delete [] rightPhase_;
+        rightPhase_ = 0;
+    }
+    
+    if (minIndicesL_) {
+        delete [] minIndicesL_;
+        minIndicesL_ = 0;
+    }
+    
+    if (minValuesL_) {
+        delete [] minValuesL_;
+        minValuesL_ = 0;
+    }
+    
+    if (maxValuesL_) {
+        delete [] maxValuesL_;
+        maxValuesL_ = 0;
+    }
+    
+    if (minIndicesR_) {
+        delete [] minIndicesR_;
+        minIndicesR_ = 0;
+    }
+    
+    if (minValuesR_) {
+        delete [] minValuesR_;
+        minValuesR_ = 0;
+    }
+    
+    if (maxValuesR_) {
+        delete [] maxValuesR_;
+        maxValuesR_ = 0;
+    }
+    
+    if (azimuthL_) {
+        for (int n = 0; n<BLOCK_SIZE/2+1; n++)
+            delete [] azimuthL_[n];
+        
+        delete [] azimuthL_;
+        azimuthL_ = 0;
+    }
+    
+    if (azimuthR_) {
+        for (int n = 0; n<BLOCK_SIZE/2+1; n++)
+            delete [] azimuthR_[n];
+        
+        delete [] azimuthR_;
+        azimuthR_ = 0;
+    }
+    
 }
+
+
 
 void ADRess::setStatus(Status_t newStatus)
 {
     currStatus_ = newStatus;
 }
 
+
+
 void ADRess::setDirection(int newDirection)
 {
-    if (newDirection <= BETA/2) {
+    if (newDirection == BETA/2) {
+        d_ = newDirection;
+        LR_ = 2;
+    }
+    else if (newDirection < BETA/2) {
         d_  = newDirection;
         LR_ = 0;
     }
@@ -84,15 +184,21 @@ void ADRess::setDirection(int newDirection)
 
 }
 
+
+
 void ADRess::setWidth(int newWidth)
 {
     H_ = newWidth;
 }
 
+
+
 const ADRess::Status_t ADRess::getStatus()
 {
     return currStatus_;
 }
+
+
 
 const int ADRess::getDirection()
 {
@@ -103,10 +209,15 @@ const int ADRess::getDirection()
     }
 }
 
+
+
 const int ADRess::getWidth()
 {
     return H_;
 }
+
+
+
 
 void ADRess::process(float *leftData, float *rightData)
 {
@@ -132,49 +243,116 @@ void ADRess::process(float *leftData, float *rightData)
         
         
         // generate right or left azimuth
-        if (LR_) { // when right channel dominates
+        if (LR_ == 1) { // when right channel dominates
             for (int n = 0; n<BLOCK_SIZE/2+1; n++)
                 for (int g = 0; g<=BETA; g++)
-                    azimuth_[n][g] = std::abs(leftSpectrum_[n] - rightSpectrum_[n]*(float)2.0*(float)g/(float)BETA);
+                    azimuthR_[n][g] = std::abs(leftSpectrum_[n] - rightSpectrum_[n]*(float)2.0*(float)g/(float)BETA);
             
-        } else {   // when left channel dominates
+            for (int n = 0; n<BLOCK_SIZE/2+1; n++) {
+                getMinimum(n, azimuthR_[n], minValuesR_, minIndicesR_);
+                getMaximum(n, azimuthR_[n], maxValuesR_);
+                
+                for (int g = 0; g<=BETA; g++)
+                    azimuthR_[n][g] = 0;
+                
+                if  (currStatus_ == kSolo)
+                    // for better rejection of signal from other channel
+                    azimuthR_[n][minIndicesR_[n]] = maxValuesR_[n] - minValuesR_[n];
+                else
+                    azimuthR_[n][minIndicesR_[n]] = maxValuesR_[n];
+                
+                resynMagR_[n] = sumUpPeaks(azimuthR_[n]);
+            }
+            
+        } else if (LR_ == 0) {   // when left channel dominates
             for (int n = 0; n<BLOCK_SIZE/2+1; n++)
                 for (int g = 0; g<=BETA; g++)
-                    azimuth_[n][g] = std::abs(rightSpectrum_[n] - leftSpectrum_[n]*(float)2.0*(float)g/(float)BETA);
+                    azimuthL_[n][g] = std::abs(rightSpectrum_[n] - leftSpectrum_[n]*(float)2.0*(float)g/(float)BETA);
+            
+            for (int n = 0; n<BLOCK_SIZE/2+1; n++) {
+                getMinimum(n, azimuthL_[n], minValuesL_, minIndicesL_);
+                getMaximum(n, azimuthL_[n], maxValuesL_);
+                
+                for (int g = 0; g<=BETA; g++)
+                    azimuthL_[n][g] = 0;
+                
+                if  (currStatus_ == kSolo)
+                    // for better rejection of signal from other channel
+                    azimuthL_[n][minIndicesL_[n]] = maxValuesL_[n] - minValuesL_[n];
+                else
+                    azimuthL_[n][minIndicesL_[n]] = maxValuesL_[n];
+                
+                resynMagL_[n] = sumUpPeaks(azimuthL_[n]);
+            }
+            
+        } else {
+            // azimuthR_ for right channel
+            for (int n = 0; n<BLOCK_SIZE/2+1; n++)
+                for (int g = 0; g<=BETA; g++)
+                    azimuthR_[n][g] = std::abs(leftSpectrum_[n] - rightSpectrum_[n]*(float)2.0*(float)g/(float)BETA);
+            // azimuthL_ for left channel
+            for (int n = 0; n<BLOCK_SIZE/2+1; n++)
+                for (int g = 0; g<=BETA; g++)
+                    azimuthL_[n][g] = std::abs(rightSpectrum_[n] - leftSpectrum_[n]*(float)2.0*(float)g/(float)BETA);
+            
+            for (int n = 0; n<BLOCK_SIZE/2+1; n++) {
+                getMinimum(n, azimuthR_[n], minValuesR_, minIndicesR_);
+                getMaximum(n, azimuthR_[n], maxValuesR_);
+                
+                for (int g = 0; g<=BETA; g++)
+                    azimuthR_[n][g] = 0;
+                
+                if  (currStatus_ == kSolo)
+                    // for better rejection of signal from other channel
+                    azimuthR_[n][minIndicesR_[n]] = maxValuesR_[n] - minValuesR_[n];
+                else
+                    azimuthR_[n][minIndicesR_[n]] = maxValuesR_[n];
+                
+                resynMagR_[n] = sumUpPeaks(azimuthR_[n]);
+            }
+            
+            for (int n = 0; n<BLOCK_SIZE/2+1; n++) {
+                getMinimum(n, azimuthL_[n], minValuesL_, minIndicesL_);
+                getMaximum(n, azimuthL_[n], maxValuesL_);
+                
+                for (int g = 0; g<=BETA; g++)
+                    azimuthL_[n][g] = 0;
+                
+                if  (currStatus_ == kSolo)
+                    // for better rejection of signal from other channel
+                    azimuthL_[n][minIndicesL_[n]] = maxValuesL_[n] - minValuesL_[n];
+                else
+                    azimuthL_[n][minIndicesL_[n]] = maxValuesL_[n];
+                
+                resynMagL_[n] = sumUpPeaks(azimuthL_[n]);
+            }
+            
         }
         
-        // find azimuth minima and turn them to peaks
-        for (int n = 0; n<BLOCK_SIZE/2+1; n++) {
-            getMinimum(n, azimuth_[n]);
-            getMaximum(n, azimuth_[n]);
-            
-            for (int g = 0; g<=BETA; g++)
-                azimuth_[n][g] = 0;
-            
-            if  (currStatus_ == kSolo)
-                // for better rejection of signal from other channel
-                azimuth_[n][minIndices_[n]] = maxValues_[n] - minValues_[n];
-            else
-                azimuth_[n][minIndices_[n]] = maxValues_[n];
-            
-            resynMag_[n] = sumUpPeaks(azimuth_[n]);
-        }
         
-        
-        
-        if (LR_) {
+        if (LR_ == 1) {
             for (int i = 0; i<BLOCK_SIZE/2+1; i++)
-                rightSpectrum_[i] = std::polar(resynMag_[i], rightPhase_[i]);
+                rightSpectrum_[i] = std::polar(resynMagR_[i], rightPhase_[i]);
             
             kiss_fftri(inv_, (kiss_fft_cpx*)rightSpectrum_, (kiss_fft_scalar*)rightData);
             memcpy(leftData, rightData, BLOCK_SIZE*sizeof(float));
             
-        } else {
+        } else if (LR_ == 0){
             for (int i = 0; i<BLOCK_SIZE/2+1; i++)
-                leftSpectrum_[i] = std::polar(resynMag_[i], leftPhase_[i]);
+                leftSpectrum_[i] = std::polar(resynMagL_[i], leftPhase_[i]);
             
             kiss_fftri(inv_, (kiss_fft_cpx*)leftSpectrum_, (kiss_fft_scalar*)leftData);
             memcpy(rightData, leftData, BLOCK_SIZE*sizeof(float));
+        } else {
+            
+            for (int i = 0; i<BLOCK_SIZE/2+1; i++)
+                rightSpectrum_[i] = std::polar(resynMagR_[i], rightPhase_[i]);
+            kiss_fftri(inv_, (kiss_fft_cpx*)rightSpectrum_, (kiss_fft_scalar*)rightData);
+            
+            for (int i = 0; i<BLOCK_SIZE/2+1; i++)
+                leftSpectrum_[i] = std::polar(resynMagL_[i], leftPhase_[i]);
+            
+            kiss_fftri(inv_, (kiss_fft_cpx*)leftSpectrum_, (kiss_fft_scalar*)leftData);
         }
         
         
@@ -195,7 +373,10 @@ void ADRess::process(float *leftData, float *rightData)
     }
 }
 
-void ADRess::getMinimum(int nthBin, float *nthBinAzm)
+
+
+
+void ADRess::getMinimum(int nthBin, float* nthBinAzm, float* minValues, int* minIndices)
 {
     int minIndex = 0;
     float minValue = nthBinAzm[0];
@@ -207,11 +388,14 @@ void ADRess::getMinimum(int nthBin, float *nthBinAzm)
         }
     }
     
-    minIndices_[nthBin] = minIndex;
-    minValues_[nthBin] = minValue;
+    minIndices[nthBin] = minIndex;
+    minValues[nthBin] = minValue;
 }
 
-void ADRess::getMaximum(int nthBin, float *nthBinAzm)
+
+
+
+void ADRess::getMaximum(int nthBin, float* nthBinAzm, float* maxValues)
 {
     float maxValue = nthBinAzm[0];
     
@@ -219,8 +403,11 @@ void ADRess::getMaximum(int nthBin, float *nthBinAzm)
         if (nthBinAzm[i]>maxValue)
             maxValue = nthBinAzm[i];
     
-    maxValues_[nthBin] = maxValue;
+    maxValues[nthBin] = maxValue;
 }
+
+
+
 
 float ADRess::sumUpPeaks(float *nthBinAzm)
 {
@@ -248,10 +435,10 @@ float ADRess::sumUpPeaks(float *nthBinAzm)
                     sum += nthBinAzm[i];
             
             // smoothing along azimuth
-            for (int i = 0; i<4; i++)
-                if (startInd+i<endInd-i)
-                    sum += nthBinAzm[startInd-i]*(4-i)/4 + nthBinAzm[endInd+i]*(4-i)/4;
-            break;
+//            for (int i = 0; i<4; i++)
+//                if (startInd+i<endInd-i)
+//                    sum += nthBinAzm[startInd+i]*(4-i)/4 + nthBinAzm[endInd-i]*(4-i)/4;
+//            break;
             
         case kBypass:
         default:
