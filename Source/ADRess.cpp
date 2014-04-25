@@ -452,47 +452,46 @@ void ADRess::getMaximum(int nthBin, float* nthBinAzm, float* maxValues)
 
 float ADRess::sumUpPeaks(int nthBIn, float *nthBinAzm)
 {
-    if (frequencyMask_[nthBIn] == 0.0) {
-        return 0.0;
-    } else {
-        
-        float sum = 0.0;
-        
-        int startInd = std::max(0, d_-H_/2);
-        int endInd = std::min(BETA, d_+H_/2);
-        
-        switch (currStatus_) {
-            case kSolo:
+    float sum = 0.0;
+    
+    int startInd = std::max(0, d_-H_/2);
+    int endInd = std::min(BETA, d_+H_/2);
+    
+    switch (currStatus_) {
+        case kSolo:
+            
+            if (frequencyMask_[nthBIn] == 0.0)
+                return 0.0;
+            
+            for (int i = startInd; i<=endInd; i++)
+                sum += nthBinAzm[i];
+            
+            // add smoothing along azimuth
+            for (int i = 1; i<4 && startInd-i>=0; i++)
+                sum += nthBinAzm[startInd-i]*(4-i)/4;
+            for (int i = 1; i<4 && endInd+i<=BETA;i++)
+                sum += nthBinAzm[endInd+i]*(4-i)/4;
+            
+            sum *= frequencyMask_[nthBIn];
+            break;
+            
+        case kMute:
+            if (currFilter_) {
                 for (int i = startInd; i<=endInd; i++)
                     sum += nthBinAzm[i];
-                
-                // add smoothing along azimuth
-                for (int i = 1; i<4 && startInd-i>=0; i++)
-                    sum += nthBinAzm[startInd-i]*(4-i)/4;
-                for (int i = 1; i<4 && endInd+i<=BETA;i++)
-                    sum += nthBinAzm[endInd+i]*(4-i)/4;
-                
                 sum *= frequencyMask_[nthBIn];
-                break;
-                
-            case kMute:
-                if (currFilter_) {
-                    for (int i = startInd; i<=endInd; i++)
-                        sum += nthBinAzm[i];
-                    sum *= frequencyMask_[nthBIn];
-                }
-                
-                for (int i = 0; i<=BETA; i++)
-                    if (i<startInd || i>endInd)
-                        sum += nthBinAzm[i];
-                
-            case kBypass:
-            default:
-                break;
-                
-        }
-        return sum;
+            }
+            
+            for (int i = 0; i<=BETA; i++)
+                if (i<startInd || i>endInd)
+                    sum += nthBinAzm[i];
+            
+        case kBypass:
+        default:
+            break;
+            
     }
+    return sum;
     
 }
 
