@@ -216,7 +216,7 @@ void ADRess::setFilterType(FilterType_t newFilterType)
 void ADRess::setCutOffFrequency(float newCutOffFrequency)
 {
     cutOffFrequency_ = newCutOffFrequency;
-    cutOffBinIndex_ = static_cast<int>(cutOffFrequency_/sampleRate_);
+    cutOffBinIndex_ = static_cast<int>(cutOffFrequency_/sampleRate_*BLOCK_SIZE);
     updateFrequencyMask();
 }
 
@@ -500,20 +500,20 @@ void ADRess::updateFrequencyMask()
 {
     switch (currFilter_) {
         case kAllPass:
-            for (int i = 0; i<BETA/2+1; i++ )
+            for (int i = 0; i<BLOCK_SIZE/2+1; i++ )
                 frequencyMask_[i] = 1.0;
             break;
             
         case kLowPass:
             for (int i = 0; i<cutOffBinIndex_; i++)
                 frequencyMask_[i] = 1.0;
-            for (int i = cutOffBinIndex_; i<BETA/2+1; i++)
+            for (int i = cutOffBinIndex_; i<BLOCK_SIZE/2+1; i++)
                 frequencyMask_[i] = 0.0;
             
             frequencyMask_[cutOffBinIndex_] = 0.5;
             if (cutOffBinIndex_-1 >= 0)
                 frequencyMask_[cutOffBinIndex_-1] = 0.75;
-            if (cutOffBinIndex_+1 <= BETA/2)
+            if (cutOffBinIndex_+1 <= BLOCK_SIZE/2)
                 frequencyMask_[cutOffBinIndex_+1] = 0.25;
             
             break;
@@ -521,14 +521,14 @@ void ADRess::updateFrequencyMask()
         case kHighPass:
             for (int i = 0; i<cutOffBinIndex_; i++)
                 frequencyMask_[i] = 0.0;
-            for (int i = cutOffBinIndex_; i<BETA/2+1; i++)
+            for (int i = cutOffBinIndex_; i<BLOCK_SIZE/2+1; i++)
                 frequencyMask_[i] = 1.0;
             break;
             
             frequencyMask_[cutOffBinIndex_] = 0.5;
             if (cutOffBinIndex_-1 >= 0)
                 frequencyMask_[cutOffBinIndex_-1] = 0.25;
-            if (cutOffBinIndex_+1 <= BETA/2)
+            if (cutOffBinIndex_+1 <= BLOCK_SIZE/2)
                 frequencyMask_[cutOffBinIndex_+1] = 0.75;
             
         default:
