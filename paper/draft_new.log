@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  26 APR 2014 11:54
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  26 APR 2014 14:39
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -551,114 +551,92 @@ Overfull \hbox (3.27504pt too wide) in paragraph at lines 112--115
 n\T1/aer/m/n/9 ]: Sound
  []
 
-
-LaTeX Warning: Citation `Mann:06' on page \thepage  undefined on input line 129
-.
-
-LaTeX Font Info:    Try loading font information for T1+aett on input line 130.
+LaTeX Font Info:    Try loading font information for T1+aett on input line 122.
 
 (/usr/local/texlive/2013/texmf-dist/tex/latex/ae/t1aett.fd
 File: t1aett.fd 1997/11/16 Font definitions for T1/aett.
-)
-Underfull \hbox (badness 10000) in paragraph at lines 130--130
-[][]$\T1/aett/m/n/9 https : / / www . moma . org / visit / calendar / exhibitio
-ns /
- []
-
-
-Overfull \hbox (145.89561pt too wide) in paragraph at lines 131--131
-[][]$\T1/aett/m/n/9 http : / / inhabitat . com / fantastic-[]xylophone-[]bicycl
-e-[]bridge-[]plays-[]music-[]as-[]you-[]ride /
- []
-
-
-LaTeX Warning: Citation `Takahashi:12' on page \thepage  undefined on input lin
-e 132.
-
-[1{/usr/local/texlive/2013/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
+) [1{/usr/local/texlive/2013/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
 
 
 ]
-Overfull \hbox (4.5057pt too wide) in paragraph at lines 153--154
+Overfull \hbox (4.5057pt too wide) in paragraph at lines 151--152
 []\T1/aer/m/n/9 In ad-di-tion to the al-go-rith-mic mod-i-fi-ca-tion above, we 
 added
  []
 
 
-Overfull \hbox (4.60593pt too wide) in paragraph at lines 182--183
-\T1/aer/m/n/9 within the pro-cess-Block func-tion. They are sample-by-sample
+Overfull \hbox (3.43495pt too wide) in paragraph at lines 162--163
+\T1/aer/m/n/9 two classes \T1/aer/m/sl/9 Plug-inEd-i-tor \T1/aer/m/n/9 and \T1/
+aer/m/sl/9 Plug-in-Pro-ces-sor \T1/aer/m/n/9 made by jucer[]
  []
 
 
-Overfull \hbox (3.33492pt too wide) in paragraph at lines 188--189
-\T1/aer/m/n/9 plu-gin. It uses Juce's ba-sic com-po-nent: Tog-gle-But-ton, Slid
-er,
+Overfull \hbox (5.14584pt too wide) in paragraph at lines 180--181
+\T1/aer/m/n/9 within the \T1/aer/m/sl/9 pro-cess-Block \T1/aer/m/n/9 func-tion.
+ They are sample-by-sample
  []
 
-
-Overfull \hbox (5.94429pt too wide) in paragraph at lines 195--196
-[]\T1/aer/m/n/9 Kiss_fft, a third-party li-brary is used for FFT in this projec
-t.
- []
-
-[2] <UI1.png, id=20, 747.79375pt x 401.5pt>
+[2] <UI1.png, id=21, 747.79375pt x 401.5pt>
 File: UI1.png Graphic file (type png)
  <use UI1.png>
-Package pdftex.def Info: UI1.png used on input line 211.
-(pdftex.def)             Requested size: 120.95892pt x 64.93971pt.
+Package pdftex.def Info: UI1.png used on input line 225.
+(pdftex.def)             Requested size: 118.54106pt x 63.64091pt.
 
-<UI2.png, id=21, 726.715pt x 389.455pt>
+<UI2.png, id=22, 726.715pt x 389.455pt>
 File: UI2.png Graphic file (type png)
  <use UI2.png>
-Package pdftex.def Info: UI2.png used on input line 212.
-(pdftex.def)             Requested size: 120.95892pt x 64.82184pt.
+Package pdftex.def Info: UI2.png used on input line 226.
+(pdftex.def)             Requested size: 118.54106pt x 63.52635pt.
 
-<UI3.png, id=22, 724.7075pt x 388.45125pt>
+<UI3.png, id=23, 724.7075pt x 388.45125pt>
 File: UI3.png Graphic file (type png)
  <use UI3.png>
-Package pdftex.def Info: UI3.png used on input line 213.
-(pdftex.def)             Requested size: 120.95892pt x 64.8326pt.
+Package pdftex.def Info: UI3.png used on input line 227.
+(pdftex.def)             Requested size: 118.54106pt x 63.53452pt.
 
-<UI4.png, id=23, 722.7pt x 388.45125pt>
+<UI4.png, id=24, 722.7pt x 388.45125pt>
 File: UI4.png Graphic file (type png)
  <use UI4.png>
-Package pdftex.def Info: UI4.png used on input line 214.
-(pdftex.def)             Requested size: 120.95892pt x 65.0104pt.
+Package pdftex.def Info: UI4.png used on input line 228.
+(pdftex.def)             Requested size: 118.54106pt x 63.71234pt.
 
-Overfull \hbox (12.0pt too wide) in paragraph at lines 209--218
+Overfull \hbox (6.96277pt too wide) in paragraph at lines 223--232
 []$[]$ 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 209--218
+Underfull \hbox (badness 10000) in paragraph at lines 223--232
 
  []
 
-[3 <./UI1.png> <./UI2.png> <./UI3.png> <./UI4.png>] (./draft_new.aux) ) 
+[3 <./UI1.png> <./UI2.png> <./UI3.png> <./UI4.png>] [4
+
+] (./draft_new.aux) ) 
 Here is how much of TeX's memory you used:
- 4288 strings out of 493315
- 59799 string characters out of 6137904
- 127231 words of memory out of 5000000
- 7625 multiletter control sequences out of 15000+600000
- 53306 words of font info for 72 fonts, out of 8000000 for 9000
+ 4298 strings out of 493315
+ 59901 string characters out of 6137904
+ 128255 words of memory out of 5000000
+ 7634 multiletter control sequences out of 15000+600000
+ 54839 words of font info for 73 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
- 41i,10n,38p,681b,334s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/lo
-cal/texlive/2013/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/texlive/201
-3/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb></usr/local/texlive/2013/
-texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texlive/2013/tex
-mf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/2013/texmf-
-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/local/texlive/2013/texmf-di
-st/fonts/type1/public/amsfonts/cm/cmti9.pfb></usr/local/texlive/2013/texmf-dist
-/fonts/type1/public/amsfonts/cm/cmtt9.pfb></usr/local/texlive/2013/texmf-dist/f
-onts/type1/urw/helvetic/uhvb8a.pfb></usr/local/texlive/2013/texmf-dist/fonts/ty
-pe1/urw/helvetic/uhvr8a.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/urw
-/times/utmb8a.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/urw/times/utm
-r8a.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on draft_new.pdf (3 pages, 245020 bytes).
+ 41i,10n,38p,829b,334s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/local/texlive/2013/texmf-dist/fonts/enc/dvips/base/8
+r.enc}</usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.
+pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb
+></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></
+usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl9.pfb></us
+r/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/
+local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmti9.pfb></usr/lo
+cal/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt9.pfb></usr/loca
+l/texlive/2013/texmf-dist/fonts/type1/urw/helvetic/uhvb8a.pfb></usr/local/texli
+ve/2013/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/local/texlive/2013
+/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2013/texmf-dis
+t/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2013/texmf-dist/fonts/ty
+pe1/urw/times/utmri8a.pfb>
+Output written on draft_new.pdf (4 pages, 269057 bytes).
 PDF statistics:
- 63 PDF objects out of 1000 (max. 8388607)
- 42 compressed objects within 1 object stream
+ 70 PDF objects out of 1000 (max. 8388607)
+ 47 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  21 words of extra memory for PDF output out of 10000 (max. 10000000)
 
