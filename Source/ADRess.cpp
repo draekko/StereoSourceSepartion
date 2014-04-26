@@ -344,43 +344,38 @@ void ADRess::process(float *leftData, float *rightData)
             
         } else {
             // azimuthR_ for right channel
-            for (int n = 0; n<BLOCK_SIZE/2+1; n++)
-                for (int g = 0; g<=BETA; g++)
+            for (int n = 0; n<BLOCK_SIZE/2+1; n++) {
+                for (int g = 0; g<=BETA; g++) {
                     azimuthR_[n][g] = std::abs(leftSpectrum_[n] - rightSpectrum_[n]*(float)2.0*(float)g/(float)BETA);
-            // azimuthL_ for left channel
-            for (int n = 0; n<BLOCK_SIZE/2+1; n++)
-                for (int g = 0; g<=BETA; g++)
                     azimuthL_[n][g] = std::abs(rightSpectrum_[n] - leftSpectrum_[n]*(float)2.0*(float)g/(float)BETA);
+                }
+                
+            }
             
             for (int n = 0; n<BLOCK_SIZE/2+1; n++) {
                 getMinimum(n, azimuthR_[n], minValuesR_, minIndicesR_);
                 getMaximum(n, azimuthR_[n], maxValuesR_);
                 
-                for (int g = 0; g<=BETA; g++)
-                    azimuthR_[n][g] = 0;
-                
-                if  (currStatus_ == kSolo)
-                    // for better rejection of signal from other channel
-                    azimuthR_[n][minIndicesR_[n]] = maxValuesR_[n] - minValuesR_[n];
-                else
-                    azimuthR_[n][minIndicesR_[n]] = maxValuesR_[n];
-                
-                resynMagR_[n] = sumUpPeaks(n, azimuthR_[n]);
-            }
-            
-            for (int n = 0; n<BLOCK_SIZE/2+1; n++) {
                 getMinimum(n, azimuthL_[n], minValuesL_, minIndicesL_);
                 getMaximum(n, azimuthL_[n], maxValuesL_);
                 
-                for (int g = 0; g<=BETA; g++)
+                for (int g = 0; g<=BETA; g++) {
+                    azimuthR_[n][g] = 0;
                     azimuthL_[n][g] = 0;
+                }
                 
-                if  (currStatus_ == kSolo)
+                if  (currStatus_ == kSolo) {
                     // for better rejection of signal from other channel
+                    azimuthR_[n][minIndicesR_[n]] = maxValuesR_[n] - minValuesR_[n];
                     azimuthL_[n][minIndicesL_[n]] = maxValuesL_[n] - minValuesL_[n];
-                else
+                    
+                } else {
+                    azimuthR_[n][minIndicesR_[n]] = maxValuesR_[n];
                     azimuthL_[n][minIndicesL_[n]] = maxValuesL_[n];
+                    
+                }
                 
+                resynMagR_[n] = sumUpPeaks(n, azimuthR_[n]);
                 resynMagL_[n] = sumUpPeaks(n, azimuthL_[n]);
             }
             
@@ -388,6 +383,7 @@ void ADRess::process(float *leftData, float *rightData)
             // resynth and output
             for (int i = 0; i<BLOCK_SIZE/2+1; i++)
                 rightSpectrum_[i] = std::polar(resynMagR_[i], rightPhase_[i]);
+            
             kiss_fftri(inv_, (kiss_fft_cpx*)rightSpectrum_, (kiss_fft_scalar*)rightData);
             
             for (int i = 0; i<BLOCK_SIZE/2+1; i++)
