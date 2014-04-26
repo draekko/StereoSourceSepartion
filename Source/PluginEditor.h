@@ -65,6 +65,8 @@ private:
     ScopedPointer<Label> freqVal;
     ScopedPointer<Label> lowboundLabel;
     ScopedPointer<Label> highboundLabel;
+    ScopedPointer<Label> modeLabel;
+    ScopedPointer<Label> filterLabel;
 
     StereoSourceSeparationAudioProcessor* getProcessor() const
     {

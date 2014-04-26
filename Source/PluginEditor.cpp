@@ -31,6 +31,22 @@ StereoSourceSeparationAudioProcessorEditor::StereoSourceSeparationAudioProcessor
     widthSlider->setValue(12.5);
     widthSlider->addListener(this);
     
+    addAndMakeVisible (modeLabel = new Label (String::empty, "Mode"));
+    modeLabel->setFont (Font (16.00f, Font::bold));
+    modeLabel->setJustificationType (Justification::centred);
+    modeLabel->setEditable (false, false, false);
+    modeLabel->setColour (Label::textColourId, Colours::wheat);
+    modeLabel->setColour (TextEditor::textColourId, Colours::wheat);
+    modeLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    
+    addAndMakeVisible (filterLabel = new Label (String::empty, "Filter Type"));
+    filterLabel->setFont (Font (16.00f, Font::bold));
+    filterLabel->setJustificationType (Justification::centred);
+    filterLabel->setEditable (false, false, false);
+    filterLabel->setColour (Label::textColourId, Colours::wheat);
+    filterLabel->setColour (TextEditor::textColourId, Colours::wheat);
+    filterLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    
     addAndMakeVisible (bypassToggle = new ToggleButton ("Bypass"));
     bypassToggle->setColour(TextButton::buttonColourId, Colours::lightgrey);
     bypassToggle->setColour(ToggleButton::textColourId, Colours::lightgrey);
@@ -50,6 +66,7 @@ StereoSourceSeparationAudioProcessorEditor::StereoSourceSeparationAudioProcessor
     addAndMakeVisible (allpassToggle = new ToggleButton ("All pass"));
     allpassToggle->setColour(TextButton::buttonColourId, Colours::lightgrey);
     allpassToggle->setColour(ToggleButton::textColourId, Colours::lightgrey);
+    allpassToggle->setToggleState(true, juce::sendNotification);
     allpassToggle->setEnabled(false);
     allpassToggle->addListener (this);
     
@@ -68,9 +85,9 @@ StereoSourceSeparationAudioProcessorEditor::StereoSourceSeparationAudioProcessor
     addAndMakeVisible(cutofffreqSlider = new Slider());
     cutofffreqSlider->setSliderStyle(juce::Slider::LinearBar);
     cutofffreqSlider->setTextBoxStyle(Slider::NoTextBox, true, 220, 30);
-    cutofffreqSlider->setColour(Slider::thumbColourId, Colour(0xffCCFFFF));
-    cutofffreqSlider->setColour(Slider::trackColourId, Colours::wheat);
-    cutofffreqSlider->setRange(0, 63.25);
+    cutofffreqSlider->setColour(Slider::thumbColourId, Colours::lightgrey);
+    cutofffreqSlider->setColour(Slider::trackColourId, Colours::lightgrey);
+    cutofffreqSlider->setRange(0, 89.45);
     cutofffreqSlider->setValue(20);
     cutofffreqSlider->addListener(this);
     
@@ -98,7 +115,7 @@ StereoSourceSeparationAudioProcessorEditor::StereoSourceSeparationAudioProcessor
     lowboundLabel->setColour (TextEditor::textColourId, Colours::wheat);
     lowboundLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     
-    addAndMakeVisible (highboundLabel = new Label (String::empty, "4000"));
+    addAndMakeVisible (highboundLabel = new Label (String::empty, "8000"));
     highboundLabel->setFont (Font (16.00f, Font::bold));
     highboundLabel->setJustificationType (Justification::centred);
     highboundLabel->setEditable (false, false, false);
@@ -106,8 +123,8 @@ StereoSourceSeparationAudioProcessorEditor::StereoSourceSeparationAudioProcessor
     highboundLabel->setColour (TextEditor::textColourId, Colours::wheat);
     highboundLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     
-    addAndMakeVisible (resetButton = new TextButton ("Go to Center"));
-    resetButton->setColour(TextButton::buttonColourId, Colour(0xffccffcc));
+    addAndMakeVisible (resetButton = new TextButton ("C"));
+    resetButton->setColour(TextButton::buttonColourId, Colours::wheat);
     resetButton->addListener (this);
     
     addAndMakeVisible (dirLabel = new Label (String::empty,"Direction : "));
@@ -177,6 +194,8 @@ StereoSourceSeparationAudioProcessorEditor::~StereoSourceSeparationAudioProcesso
     freqVal = nullptr;
     lowboundLabel = nullptr;
     highboundLabel = nullptr;
+    modeLabel = nullptr;
+    filterLabel = nullptr;
 }
 
 //==============================================================================
@@ -191,6 +210,8 @@ void StereoSourceSeparationAudioProcessorEditor::paint (Graphics& g)
     g.strokePath (arrowPath, PathStrokeType (1.200f));
     g.setColour (Colours::wheat);
     g.drawEllipse(50+5, 100+5, width_-10, 2*height_-10, 8);
+    g.setColour(Colours::lightgrey);
+    g.drawLine(600, 90, 600, 190);
     g.setColour(Colours::darkgrey);
     g.fillRect(0, 100+height_, getWidth(), getHeight()-height_-100);
 }
@@ -207,18 +228,20 @@ void StereoSourceSeparationAudioProcessorEditor::resized()
     arrowPath.closeSubPath();
     
     widthSlider->setBounds(150, 330, 200, 40);
-    bypassToggle->setBounds(500, 100, 80, 30);
-    soloToggle->setBounds(500, 130, 80, 30);
-    muteToggle->setBounds(500, 160, 80, 30);
-    allpassToggle->setBounds(620, 100, 80, 30);
-    lowpassToggle->setBounds(620, 130, 80, 30);
-    highpassToggle->setBounds(620, 160, 80, 30);
+    modeLabel->setBounds(510, 80, 40, 30);
+    filterLabel->setBounds(620, 80, 80, 30);
+    bypassToggle->setBounds(500, 110, 80, 30);
+    soloToggle->setBounds(500, 140, 80, 30);
+    muteToggle->setBounds(500, 170, 80, 30);
+    allpassToggle->setBounds(620, 110, 80, 30);
+    lowpassToggle->setBounds(620, 140, 80, 30);
+    highpassToggle->setBounds(620, 170, 80, 30);
     cutofffreqSlider->setBounds(500, 280, 200, 20);
     lowboundLabel->setBounds(500, 300, 20, 20);
     freqLabel->setBounds(500, 230, 120, 40);
     freqVal->setBounds(620, 230, 80, 40);
     highboundLabel->setBounds(660, 300, 40, 20);
-    resetButton->setBounds(540, 60, 120, 20);
+    resetButton->setBounds(100, 340, 20, 20);
     dirLabel->setBounds(50, 50, 80, 25);
     widLabel->setBounds(300, 50, 100, 25);
     dirVal->setBounds(150, 50, 60, 25);
@@ -277,9 +300,12 @@ void StereoSourceSeparationAudioProcessorEditor::buttonClicked (Button* buttonTh
         soloToggle->setEnabled(false);
         muteToggle->setEnabled(true);
         bypassToggle->setEnabled(true);
-        allpassToggle->setEnabled(true);
-        lowpassToggle->setEnabled(true);
-        highpassToggle->setEnabled(true);
+        if (!allpassToggle->getToggleState())
+            allpassToggle->setEnabled(true);
+        if (!lowpassToggle->getToggleState())
+            lowpassToggle->setEnabled(true);
+        if (!highpassToggle->getToggleState())
+            highpassToggle->setEnabled(true);
         allpassToggle->setButtonText("All pass");
         paintColour = Colours::lightblue;
         getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kStatus, ADRess::kSolo);
@@ -291,9 +317,12 @@ void StereoSourceSeparationAudioProcessorEditor::buttonClicked (Button* buttonTh
         soloToggle->setEnabled(true);
         muteToggle->setEnabled(false);
         bypassToggle->setEnabled(true);
-        allpassToggle->setEnabled(true);
-        lowpassToggle->setEnabled(true);
-        highpassToggle->setEnabled(true);
+        if (!allpassToggle->getToggleState())
+            allpassToggle->setEnabled(true);
+        if (!lowpassToggle->getToggleState())
+            lowpassToggle->setEnabled(true);
+        if (!highpassToggle->getToggleState())
+            highpassToggle->setEnabled(true);
         allpassToggle->setButtonText("All reject");
         paintColour = Colour (0xfff08080);
         getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kStatus, ADRess::kMute);
@@ -319,6 +348,7 @@ void StereoSourceSeparationAudioProcessorEditor::buttonClicked (Button* buttonTh
         allpassToggle->setEnabled(false);
         lowpassToggle->setEnabled(true);
         highpassToggle->setEnabled(true);
+        cutofffreqSlider->setColour(Slider::thumbColourId, Colours::lightgrey);
         getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kFilterType, ADRess::kAllPass);
     }
     else if (buttonThatWasClicked == lowpassToggle && lowpassToggle->getToggleState())
@@ -328,6 +358,7 @@ void StereoSourceSeparationAudioProcessorEditor::buttonClicked (Button* buttonTh
         lowpassToggle->setEnabled(false);
         allpassToggle->setEnabled(true);
         highpassToggle->setEnabled(true);
+        cutofffreqSlider->setColour(Slider::thumbColourId, Colours::lightblue);
         getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kFilterType, ADRess::kLowPass);
     }
     else if (buttonThatWasClicked == highpassToggle && highpassToggle->getToggleState())
@@ -337,6 +368,7 @@ void StereoSourceSeparationAudioProcessorEditor::buttonClicked (Button* buttonTh
         highpassToggle->setEnabled(false);
         allpassToggle->setEnabled(true);
         lowpassToggle->setEnabled(true);
+        cutofffreqSlider->setColour(Slider::thumbColourId, Colour (0xfff08080));
         getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kFilterType, ADRess::kHighPass);
     }
     else if (buttonThatWasClicked == resetButton)
