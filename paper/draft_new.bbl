@@ -1,0 +1,92 @@
+\begin{thebibliography}{10}
+
+\bibitem{askenfelt_measurement_1986}
+A.~Askenfelt.
+\newblock Measurement of bow motion and bow force in violin playing.
+\newblock {\em Journal of the Acoustical Society of America ({JASA)}},
+  80:1007---1015, 1986.
+
+\bibitem{barbancho_transcription_2009}
+I.~Barbancho, C.~de~la Bandera, A.~M. Barbancho, and L.~J. Tardon.
+\newblock Transcription and expressiveness detection system for violin music.
+\newblock In {\em Proceedings of the International Conference on Acoustics,
+  Speech and Signal Processing ({ICASSP)}}, page 189{\textendash}192. {IEEE},
+  2009.
+
+\bibitem{benetos_musical_2006}
+E.~Benetos, M.~Kotti, and C.~Kotropoulos.
+\newblock Musical instrument classification using non-negative matrix
+  factorization algorithms.
+\newblock In {\em Proceedings of the International Symposium on Circuits and
+  Systems ({ISCAS)}}. {IEEE}, 2006.
+
+\bibitem{bevilacqua_augmented_2006}
+F.~Bevilacqua, N.~Rasamimanana, E.~Fl{\'e}ty, S.~Lemouton, and F.~Baschet.
+\newblock The augmented violin project: research, composition and performance
+  report.
+\newblock In {\em Proceedings of the International Conference on New Interfaces
+  for Musical Expression ({NIME)}}, Paris, 2006.
+
+\bibitem{burred_hierarchical_2004}
+J.~J. Burred and A.~Lerch.
+\newblock Hierarchical automatic audio signal classification.
+\newblock {\em Journal of the Audio Engineering Society ({JAES)}},
+  52(7/8):724{\textendash}739, 2004.
+
+\bibitem{chang_libsvm:_2011}
+C.-c. Chang and C.-j. Lin.
+\newblock {LIBSVM:} a library for support vector machines.
+\newblock {\em {ACM} Transactions on Intelligent Systems and Technology
+  ({TIST)}}, 2(3), 2011.
+
+\bibitem{charles_playing_2010}
+J.~Charles.
+\newblock {\em Playing Technique and Violin Timbre: Detecting Bad Playing}.
+\newblock {PhD} thesis, Dublin Instititute of Technology, 2010.
+
+\bibitem{essid_musical_2006}
+S.~Essid, G.~Richard, and B.~David.
+\newblock Musical instrument recognition by pairwise classification strategies.
+\newblock {\em Transactions on Audio, Speech and Language Processing},
+  14(4):1401{\textendash}1412, 2006.
+
+\bibitem{groshauser_new_2010}
+T.~Gro{\ss}hauser, U.~Gro{\ss}ekath{\"o}fer, and T.~Hermann.
+\newblock New sensors and pattern recognition techniques for string
+  instruments.
+\newblock In {\em Proceedings of the Conference on New Interfaces for Musical
+  Expression ({NIME)}}, Sydney, 2010.
+
+\bibitem{lerch_introduction_2012}
+A.~Lerch.
+\newblock {\em An Introduction to Audio Content Analysis: Applications in
+  Signal Processing and Music Informatics}.
+\newblock Wiley-{IEEE} Press, Hoboken, 2012.
+
+\bibitem{maestre_gomez_modeling_2009}
+E.~Maestre~G{\'o}mez.
+\newblock {\em Modeling instrumental gestures: an analysis/synthesis framework
+  for violin bowing}.
+\newblock {PhD} thesis, Universitat Pompeu Fabra, Barcelona, 2009.
+
+\bibitem{peiper_interface_2003}
+C.~Peiper, D.~Warden, and G.~Garnett.
+\newblock An interface for real-time classification of articulations produced
+  by violin bowing.
+\newblock In {\em Proceedings of the Conference on New Interfaces for Musical
+  Expression ({NIME)}}, Montreal, 2003.
+
+\bibitem{rasamimanana_gesture_2006}
+N.~H. Rasamimanana, E.~Fl{\'e}ty, and F.~Bevilacqua.
+\newblock Gesture analysis of violin bow strokes.
+\newblock In {\em Gesture in Human-Computer Interaction and Simulation}, page
+  145{\textendash}155. Springer, 2006.
+
+\bibitem{young_classification_2008}
+D.~Young.
+\newblock Classification of common violin bowing techniques using gesture data
+  from a playable measurement system.
+\newblock In {\em Proceedings of the Conference on New Interfaces for Musical
+  Expression ({NIME)}}, 2008.
+
+\end{thebibliography}
