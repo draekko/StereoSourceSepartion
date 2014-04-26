@@ -51,12 +51,20 @@ private:
     ScopedPointer<ToggleButton> soloToggle;
     ScopedPointer<ToggleButton> muteToggle;
     ScopedPointer<ToggleButton> bypassToggle;
+    ScopedPointer<ToggleButton> allpassToggle;
+    ScopedPointer<ToggleButton> lowpassToggle;
+    ScopedPointer<ToggleButton> highpassToggle;
+    ScopedPointer<Slider> cutofffreqSlider;
     ScopedPointer<TextButton> resetButton;
     ScopedPointer<Label> dirLabel;
     ScopedPointer<Label> widLabel;
     ScopedPointer<Label> dirVal;
     ScopedPointer<Label> widVal;
     ScopedPointer<Label> sideVal;
+    ScopedPointer<Label> freqLabel;
+    ScopedPointer<Label> freqVal;
+    ScopedPointer<Label> lowboundLabel;
+    ScopedPointer<Label> highboundLabel;
 
     StereoSourceSeparationAudioProcessor* getProcessor() const
     {
