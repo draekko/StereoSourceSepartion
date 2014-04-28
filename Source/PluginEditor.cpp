@@ -63,7 +63,7 @@ StereoSourceSeparationAudioProcessorEditor::StereoSourceSeparationAudioProcessor
     muteToggle->setColour(ToggleButton::textColourId, Colours::pink);
     muteToggle->addListener (this);
     
-    addAndMakeVisible (allpassToggle = new ToggleButton ("All pass"));
+    addAndMakeVisible (allpassToggle = new ToggleButton ("No filter"));
     allpassToggle->setColour(TextButton::buttonColourId, Colours::lightgrey);
     allpassToggle->setColour(ToggleButton::textColourId, Colours::lightgrey);
     allpassToggle->setToggleState(true, juce::sendNotification);
@@ -306,7 +306,7 @@ void StereoSourceSeparationAudioProcessorEditor::buttonClicked (Button* buttonTh
             lowpassToggle->setEnabled(true);
         if (!highpassToggle->getToggleState())
             highpassToggle->setEnabled(true);
-        allpassToggle->setButtonText("All pass");
+        allpassToggle->setButtonText("No filter");
         paintColour = Colours::lightblue;
         getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kStatus, ADRess::kSolo);
     }
@@ -337,7 +337,7 @@ void StereoSourceSeparationAudioProcessorEditor::buttonClicked (Button* buttonTh
         allpassToggle->setEnabled(false);
         lowpassToggle->setEnabled(false);
         highpassToggle->setEnabled(false);
-        allpassToggle->setButtonText("All pass");
+        allpassToggle->setButtonText("No filter");
         paintColour = Colours::grey;
         getProcessor()->setParameter(StereoSourceSeparationAudioProcessor::kStatus, ADRess::kBypass);
     }
