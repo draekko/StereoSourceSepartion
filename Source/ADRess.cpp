@@ -312,8 +312,9 @@ void ADRess::process(float *leftData, float *rightData)
             kiss_fftri(inv_, (kiss_fft_cpx*)rightSpectrum_, (kiss_fft_scalar*)rightData);
             memcpy(leftData, rightData, BLOCK_SIZE*sizeof(float));
             
-            for (int i = 0; i <BLOCK_SIZE; i++)
-                leftData[i] *= 2*d_/BETA;
+            if (currStatus_ == kSolo)
+                for (int i = 0; i <BLOCK_SIZE; i++)
+                    leftData[i] *= 2.0*d_/BETA;
             
         } else if (LR_ == 0) {   // when left channel dominates
             for (int n = 0; n<BLOCK_SIZE/2+1; n++)
@@ -342,8 +343,9 @@ void ADRess::process(float *leftData, float *rightData)
             kiss_fftri(inv_, (kiss_fft_cpx*)leftSpectrum_, (kiss_fft_scalar*)leftData);
             memcpy(rightData, leftData, BLOCK_SIZE*sizeof(float));
             
-            for (int i = 0; i <BLOCK_SIZE; i++)
-                rightData[i] *= 2*d_/BETA;
+            if (currStatus_ == kSolo)
+                for (int i = 0; i <BLOCK_SIZE; i++)
+                    rightData[i] *= 2.0*d_/BETA;
             
         } else {
             // azimuthR_ for right channel
