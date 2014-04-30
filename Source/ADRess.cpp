@@ -291,8 +291,7 @@ void ADRess::process(float *leftData, float *rightData)
                     azimuthR_[n][g] = std::abs(leftSpectrum_[n] - rightSpectrum_[n]*(float)2.0*(float)g/(float)BETA);
             
             for (int n = 0; n<BLOCK_SIZE/2+1; n++) {
-                getMinimum(n, azimuthR_[n], minValuesR_, minIndicesR_);
-                getMaximum(n, azimuthR_[n], maxValuesR_);
+                getMinimumMaximum(n, azimuthR_[n], minValuesR_, minIndicesR_, maxValuesR_);
                 
                 for (int g = 0; g<=BETA; g++)
                     azimuthR_[n][g] = 0;
@@ -320,8 +319,7 @@ void ADRess::process(float *leftData, float *rightData)
                     azimuthL_[n][g] = std::abs(rightSpectrum_[n] - leftSpectrum_[n]*(float)2.0*(float)g/(float)BETA);
             
             for (int n = 0; n<BLOCK_SIZE/2+1; n++) {
-                getMinimum(n, azimuthL_[n], minValuesL_, minIndicesL_);
-                getMaximum(n, azimuthL_[n], maxValuesL_);
+                getMinimumMaximum(n, azimuthL_[n], minValuesL_, minIndicesL_, maxValuesL_);
                 
                 for (int g = 0; g<=BETA; g++)
                     azimuthL_[n][g] = 0;
@@ -353,11 +351,8 @@ void ADRess::process(float *leftData, float *rightData)
             }
             
             for (int n = 0; n<BLOCK_SIZE/2+1; n++) {
-                getMinimum(n, azimuthR_[n], minValuesR_, minIndicesR_);
-                getMaximum(n, azimuthR_[n], maxValuesR_);
-                
-                getMinimum(n, azimuthL_[n], minValuesL_, minIndicesL_);
-                getMaximum(n, azimuthL_[n], maxValuesL_);
+                getMinimumMaximum(n, azimuthR_[n], minValuesR_, minIndicesR_, maxValuesR_);
+                getMinimumMaximum(n, azimuthL_[n], minValuesL_, minIndicesL_, maxValuesL_);
                 
                 for (int g = 0; g<=BETA; g++) {
                     azimuthR_[n][g] = 0;
@@ -412,37 +407,26 @@ void ADRess::process(float *leftData, float *rightData)
 
 
 
-
-void ADRess::getMinimum(int nthBin, float* nthBinAzm, float* minValues, int* minIndices)
+void ADRess::getMinimumMaximum(int nthBin, float* nthBinAzm, float* minValues, int* minIndices, float* maxValues)
 {
     int minIndex = 0;
     float minValue = nthBinAzm[0];
+    float maxValue = nthBinAzm[0];
     
     for (int i = 1; i<=BETA; i++) {
         if (nthBinAzm[i] < minValue) {
             minIndex = i;
             minValue = nthBinAzm[i];
         }
+        if (nthBinAzm[i]>maxValue) {
+            maxValue = nthBinAzm[i];
+        }
     }
     
     minIndices[nthBin] = minIndex;
     minValues[nthBin] = minValue;
-}
-
-
-
-
-void ADRess::getMaximum(int nthBin, float* nthBinAzm, float* maxValues)
-{
-    float maxValue = nthBinAzm[0];
-    
-    for (int i = 1; i<=BETA; i++)
-        if (nthBinAzm[i]>maxValue)
-            maxValue = nthBinAzm[i];
-    
     maxValues[nthBin] = maxValue;
 }
-
 
 
 

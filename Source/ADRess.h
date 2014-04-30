@@ -92,8 +92,7 @@ private:
     float* resynMagL_;
     float* resynMagR_;
     
-    void getMinimum(int nthBin, float* nthBinAzm, float* minValues, int* minIndices);
-    void getMaximum(int nthBin, float* nthBinAzm, float* maxValues);
+    void getMinimumMaximum(int nthBin, float* nthBinAzm, float* minValues, int* minIndices, float* maxValues);
     float sumUpPeaks(int nthBin, float* nthBinAzm);
     
     void updateFrequencyMask();
